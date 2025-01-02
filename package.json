@@ -1,0 +1,18 @@
+{
+  "name": "koa-backend",
+  "version": "1.0.0",
+  "description": "不使用关系型数据库进行开发实现逻辑。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "set DEBUG=koa* && node --harmony src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.15.3",
+    "koa-compose": "^4.1.0",
+    "koa-static": "^5.0.0"
+  }
+}
