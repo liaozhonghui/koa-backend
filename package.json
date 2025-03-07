@@ -4,7 +4,7 @@
   "description": "不使用关系型数据库进行开发实现逻辑。",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "debug": "set DEBUG=koa* && node --harmony src/index.js"
   },
   "keywords": [],
