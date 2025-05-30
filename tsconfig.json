@@ -23,8 +23,7 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true
-  },
-  "include": [
+  },  "include": [
     "src/**/*"
   ],
   "exclude": [

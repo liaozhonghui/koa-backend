@@ -93,15 +93,24 @@ koa-backend/
 │   ├── app.ts          # Main application file
 │   ├── types/
 │   │   └── index.ts    # TypeScript type definitions
-│   └── routes/
-│       ├── api.ts      # General API routes
-│       └── users.ts    # User-related routes
+│   ├── routes/
+│   │   ├── api.ts      # General API routes
+│   │   └── users.ts    # User-related routes
+│   └── utils/
+│       └── index.ts    # Utility functions and services
+├── test/               # All test files (Jest with TDD approach)
+│   ├── setup.ts        # Test environment setup
+│   ├── api.test.ts     # API integration tests
+│   ├── users.test.ts   # User routes unit tests
+│   └── utils.test.ts   # Utility functions unit tests
 ├── dist/               # Compiled JavaScript (after build)
+├── coverage/           # Test coverage reports
 ├── package.json
 ├── tsconfig.json       # TypeScript configuration
 ├── jest.config.js      # Jest testing configuration
 ├── nodemon.json        # Nodemon configuration
 ├── .env               # Environment variables
+├── .env.test          # Test environment variables
 └── README.md
 ```
 
@@ -118,8 +127,41 @@ Copy `.env` file and configure:
 - `npm start` - Start production server (requires build first)
 - `npm run dev` - Start development server with TypeScript and hot reload
 - `npm run dev:watch` - Alternative development command
-- `npm test` - Run tests with Jest
+- `npm test` - Run all tests once
+- `npm run test:watch` - Run tests in watch mode (great for TDD)
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run test:ci` - Run tests for CI/CD (no watch, with coverage)
 - `npm run clean` - Clean build directory
+
+## Test-Driven Development (TDD)
+
+This project follows TDD principles with comprehensive testing:
+
+### Test Structure
+
+- **Integration Tests** (`test/api.test.ts`) - Test complete API endpoints
+- **Unit Tests** (`test/users.test.ts`) - Test individual route handlers
+- **Utility Tests** (`test/utils.test.ts`) - Test utility functions and services
+
+### Running Tests
+
+```bash
+# Run all tests once
+npm test
+
+# Run tests in watch mode (recommended for TDD)
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### TDD Workflow
+
+1. Write a failing test
+2. Write minimal code to make it pass
+3. Refactor the code
+4. Repeat
 
 ## Technologies Used
 

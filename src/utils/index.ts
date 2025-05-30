@@ -3,12 +3,18 @@ import { User, ApiResponse } from '../types';
 /**
  * Utility functions for user operations
  */
-export class UserService {
-  /**
+export class UserService {  /**
    * Validates user email format
    */
   static isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Basic but effective email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    // Additional checks for edge cases
+    if (!email || email.includes('..') || email.includes(' ') || email.includes('@@')) {
+      return false;
+    }
+    
     return emailRegex.test(email);
   }
 
