@@ -1,10 +1,11 @@
 # Koa Backend
 
-A modern REST API backend built with **Koa 3.0.0** and Node.js.
+A modern REST API backend built with **Koa 3.0.0**, **TypeScript**, and Node.js.
 
 ## Features
 
 - ✅ Modern async/await syntax with Koa 3.0.0
+- ✅ **TypeScript** for type safety and better development experience
 - ✅ RESTful API endpoints
 - ✅ CORS support
 - ✅ Request logging
@@ -12,6 +13,7 @@ A modern REST API backend built with **Koa 3.0.0** and Node.js.
 - ✅ JSON body parsing
 - ✅ Environment configuration
 - ✅ Health check endpoints
+- ✅ Type definitions for all API responses
 
 ## Quick Start
 
@@ -27,9 +29,15 @@ npm install
 npm run dev
 ```
 
-The server will start on `http://localhost:3000`
+The server will start on `http://localhost:3000` with TypeScript compilation and hot reload.
 
-### 3. Start Production Server
+### 3. Build for Production
+
+```bash
+npm run build
+```
+
+### 4. Start Production Server
 
 ```bash
 npm start
@@ -82,11 +90,17 @@ curl http://localhost:3000/api/status
 ```
 koa-backend/
 ├── src/
-│   ├── app.js          # Main application file
+│   ├── app.ts          # Main application file
+│   ├── types/
+│   │   └── index.ts    # TypeScript type definitions
 │   └── routes/
-│       ├── api.js      # General API routes
-│       └── users.js    # User-related routes
+│       ├── api.ts      # General API routes
+│       └── users.ts    # User-related routes
+├── dist/               # Compiled JavaScript (after build)
 ├── package.json
+├── tsconfig.json       # TypeScript configuration
+├── jest.config.js      # Jest testing configuration
+├── nodemon.json        # Nodemon configuration
 ├── .env               # Environment variables
 └── README.md
 ```
@@ -100,18 +114,25 @@ Copy `.env` file and configure:
 
 ## Scripts
 
-- `npm start` - Start production server
-- `npm run dev` - Start development server with nodemon
-- `npm test` - Run tests (when implemented)
+- `npm run build` - Build TypeScript to JavaScript
+- `npm start` - Start production server (requires build first)
+- `npm run dev` - Start development server with TypeScript and hot reload
+- `npm run dev:watch` - Alternative development command
+- `npm test` - Run tests with Jest
+- `npm run clean` - Clean build directory
 
 ## Technologies Used
 
+- **TypeScript** - Type-safe JavaScript superset
 - **Koa 3.0.0** - Web framework
 - **koa-router** - Router middleware
 - **koa-bodyparser** - Body parsing middleware
-- **koa-cors** - CORS middleware
+- **@koa/cors** - CORS middleware
 - **koa-logger** - Logging middleware
 - **dotenv** - Environment variable management
+- **ts-node** - TypeScript execution for development
+- **nodemon** - Development server with hot reload
+- **Jest** - Testing framework with TypeScript support
 
 ## Next Steps
 
