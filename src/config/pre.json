@@ -1,0 +1,7 @@
+{
+  "database": {
+    "host": "pre.db.example.com"
+  },
+  "PORT": 8080,
+  "logLevel": "info"
+}

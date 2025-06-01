@@ -1,0 +1,9 @@
+{
+  "appName": "Koa Backend API",
+  "database": {
+    "host": "default_db_host",
+    "port": 5432
+  },
+  "PORT": 3000,
+  "logLevel": "info"
+}

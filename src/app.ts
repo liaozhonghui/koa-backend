@@ -1,18 +1,15 @@
-import Koa from 'koa';
-import Router from 'koa-router';
-import bodyParser from 'koa-bodyparser';
-import cors from '@koa/cors';
-import logger from 'koa-logger';
-import json from 'koa-json';
-import { config } from 'dotenv';
-import { HealthCheckResponse, ApiError } from './types';
-
-// Load environment variables
-config();
+import Koa from "koa";
+import Router from "koa-router";
+import bodyParser from "koa-bodyparser";
+import cors from "@koa/cors";
+import logger from "koa-logger";
+import json from "koa-json";
+import appConfig from "./config"; // Import the new config
+import { HealthCheckResponse, ApiError } from "./types";
 
 // Import routes
-import userRoutes from './routes/users';
-import apiRoutes from './routes/api';
+import userRoutes from "./routes/users";
+import apiRoutes from "./routes/api";
 
 const app = new Koa();
 const router = new Router();
@@ -29,29 +26,29 @@ app.use(async (ctx, next) => {
     await next();
   } catch (err: any) {
     const error: ApiError = {
-      message: err.message || 'Internal Server Error',
-      status: err.status || 500
+      message: err.message || "Internal Server Error",
+      status: err.status || 500,
     };
-    
+
     ctx.status = error.status;
     ctx.body = {
       error: {
         message: error.message,
-        status: error.status
-      }
+        status: error.status,
+      },
     };
-    console.error('Error:', err);
+    console.error("Error:", err);
   }
 });
 
 // Health check endpoint
-router.get('/', async (ctx) => {
+router.get("/", async (ctx) => {
   const response: HealthCheckResponse = {
-    message: 'Koa Backend API is running!',
-    version: '1.0.0',
-    timestamp: new Date().toISOString()
+    message: "Koa Backend API is running!",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
   };
-  
+
   ctx.body = response;
 });
 
@@ -63,7 +60,7 @@ app.use(userRoutes.allowedMethods());
 app.use(apiRoutes.routes());
 app.use(apiRoutes.allowedMethods());
 
-const PORT = process.env['PORT'] || 3000;
+const PORT = appConfig.PORT; // Use port from config
 
 // Only start the server if this file is run directly
 if (require.main === module) {

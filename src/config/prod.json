@@ -1,0 +1,7 @@
+{
+  "database": {
+    "host": "prod.db.example.com"
+  },
+  "PORT": 80,
+  "logLevel": "warn"
+}
