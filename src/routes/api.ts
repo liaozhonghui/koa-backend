@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import { StatusResponse, InfoResponse, EchoResponse } from '../types';
+import { StatusData, InfoData, EchoData, ApiResponse, ResponseCodes } from '../types';
 import { logger } from '../utils/logger';
 
 const router = new Router({ prefix: '/api' });
@@ -10,12 +10,18 @@ router.get('/status', async (ctx: any) => {
     requestId: (ctx as any).requestId 
   });
   
-  const response: StatusResponse = {
+  const statusData: StatusData = {
     status: 'healthy',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
     environment: process.env['NODE_ENV'] || 'development',
     version: '1.0.0'
+  };
+
+  const response: ApiResponse<StatusData> = {
+    code: ResponseCodes.SUCCESS,
+    msg: 'API status retrieved successfully',
+    data: statusData
   };
   
   ctx.body = response;
@@ -27,7 +33,7 @@ router.get('/info', async (ctx: any) => {
     requestId: (ctx as any).requestId 
   });
   
-  const response: InfoResponse = {
+  const infoData: InfoData = {
     name: 'Koa Backend API',
     description: 'A modern REST API built with Koa 3.0.0 and TypeScript',
     version: '1.0.0',
@@ -38,6 +44,12 @@ router.get('/info', async (ctx: any) => {
       users: '/api/users',
       info: '/api/info'
     }
+  };
+
+  const response: ApiResponse<InfoData> = {
+    code: ResponseCodes.SUCCESS,
+    msg: 'API information retrieved successfully',
+    data: infoData
   };
   
   ctx.body = response;
@@ -53,12 +65,17 @@ router.post('/echo', async (ctx: any) => {
     hasBody: !!data
   });
   
-  const response: EchoResponse = {
-    success: true,
+  const echoData: EchoData = {
     echo: data,
     timestamp: new Date().toISOString(),
     method: ctx.method,
     url: ctx.url
+  };
+
+  const response: ApiResponse<EchoData> = {
+    code: ResponseCodes.SUCCESS,
+    msg: 'Echo request processed successfully',
+    data: echoData
   };
   
   ctx.body = response;

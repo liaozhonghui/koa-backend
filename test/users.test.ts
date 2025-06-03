@@ -2,6 +2,7 @@ import request from 'supertest';
 const Koa = require('koa');
 import bodyParser from 'koa-bodyparser';
 import userRoutes from '../src/routes/users';
+import { ResponseCodes } from '../src/types';
 
 // Create a minimal Koa app for testing the routes
 const createTestApp = () => {
@@ -28,11 +29,10 @@ describe('User Routes Unit Tests', () => {
         .get('/api/users')
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('code', ResponseCodes.SUCCESS);
+      expect(response.body).toHaveProperty('msg', 'Users retrieved successfully');
       expect(response.body).toHaveProperty('data');
-      expect(response.body).toHaveProperty('count');
       expect(Array.isArray(response.body.data)).toBe(true);
-      expect(response.body.count).toBe(response.body.data.length);
     });
 
     it('should return default users', async () => {
@@ -54,29 +54,32 @@ describe('User Routes Unit Tests', () => {
         .get('/api/users/1')
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('code', ResponseCodes.SUCCESS);
+      expect(response.body).toHaveProperty('msg', 'User retrieved successfully');
       expect(response.body).toHaveProperty('data');
       expect(response.body.data).toHaveProperty('id', 1);
       expect(response.body.data).toHaveProperty('name');
       expect(response.body.data).toHaveProperty('email');
     });
 
-    it('should return 404 for non-existent user ID', async () => {
+    it('should return error for non-existent user ID', async () => {
       const response = await request(app.callback())
         .get('/api/users/999')
-        .expect(404);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('error', 'User not found');
+      expect(response.body).toHaveProperty('code', ResponseCodes.USER_NOT_FOUND);
+      expect(response.body).toHaveProperty('msg', 'User not found');
+      expect(response.body).toHaveProperty('data', null);
     });
 
     it('should handle invalid ID format', async () => {
       const response = await request(app.callback())
         .get('/api/users/invalid')
-        .expect(404);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('error', 'User not found');
+      expect(response.body).toHaveProperty('code', ResponseCodes.USER_NOT_FOUND);
+      expect(response.body).toHaveProperty('msg', 'User not found');
+      expect(response.body).toHaveProperty('data', null);
     });
   });
 
@@ -90,11 +93,11 @@ describe('User Routes Unit Tests', () => {
       const response = await request(app.callback())
         .post('/api/users')
         .send(newUser)
-        .expect(201);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('code', ResponseCodes.CREATED);
+      expect(response.body).toHaveProperty('msg', 'User created successfully');
       expect(response.body).toHaveProperty('data');
-      expect(response.body).toHaveProperty('message', 'User created successfully');
       expect(response.body.data).toHaveProperty('name', newUser.name);
       expect(response.body.data).toHaveProperty('email', newUser.email);
       expect(response.body.data).toHaveProperty('id');
@@ -107,10 +110,11 @@ describe('User Routes Unit Tests', () => {
       const response = await request(app.callback())
         .post('/api/users')
         .send(userData)
-        .expect(400);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('error', 'Name and email are required');
+      expect(response.body).toHaveProperty('code', ResponseCodes.VALIDATION_ERROR);
+      expect(response.body).toHaveProperty('msg', 'Name and email are required');
+      expect(response.body).toHaveProperty('data', null);
     });
 
     it('should validate required fields - missing email', async () => {
@@ -119,20 +123,22 @@ describe('User Routes Unit Tests', () => {
       const response = await request(app.callback())
         .post('/api/users')
         .send(userData)
-        .expect(400);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('error', 'Name and email are required');
+      expect(response.body).toHaveProperty('code', ResponseCodes.VALIDATION_ERROR);
+      expect(response.body).toHaveProperty('msg', 'Name and email are required');
+      expect(response.body).toHaveProperty('data', null);
     });
 
     it('should validate required fields - empty body', async () => {
       const response = await request(app.callback())
         .post('/api/users')
         .send({})
-        .expect(400);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('error', 'Name and email are required');
+      expect(response.body).toHaveProperty('code', ResponseCodes.VALIDATION_ERROR);
+      expect(response.body).toHaveProperty('msg', 'Name and email are required');
+      expect(response.body).toHaveProperty('data', null);
     });
 
     it('should increment user ID correctly', async () => {
@@ -142,13 +148,15 @@ describe('User Routes Unit Tests', () => {
       const response1 = await request(app.callback())
         .post('/api/users')
         .send(newUser1)
-        .expect(201);
+        .expect(200);
 
       const response2 = await request(app.callback())
         .post('/api/users')
         .send(newUser2)
-        .expect(201);
+        .expect(200);
 
+      expect(response1.body.code).toBe(ResponseCodes.CREATED);
+      expect(response2.body.code).toBe(ResponseCodes.CREATED);
       expect(response2.body.data.id).toBe(response1.body.data.id + 1);
     });
   });
@@ -165,9 +173,9 @@ describe('User Routes Unit Tests', () => {
         .send(updateData)
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('code', ResponseCodes.SUCCESS);
+      expect(response.body).toHaveProperty('msg', 'User updated successfully');
       expect(response.body).toHaveProperty('data');
-      expect(response.body).toHaveProperty('message', 'User updated successfully');
       expect(response.body.data).toHaveProperty('name', updateData.name);
       expect(response.body.data).toHaveProperty('email', updateData.email);
       expect(response.body.data).toHaveProperty('updatedAt');
@@ -181,6 +189,7 @@ describe('User Routes Unit Tests', () => {
         .send(updateData)
         .expect(200);
 
+      expect(response.body.code).toBe(ResponseCodes.SUCCESS);
       expect(response.body.data).toHaveProperty('name', updateData.name);
       expect(response.body.data).toHaveProperty('updatedAt');
     });
@@ -193,20 +202,22 @@ describe('User Routes Unit Tests', () => {
         .send(updateData)
         .expect(200);
 
+      expect(response.body.code).toBe(ResponseCodes.SUCCESS);
       expect(response.body.data).toHaveProperty('email', updateData.email);
       expect(response.body.data).toHaveProperty('updatedAt');
     });
 
-    it('should return 404 for non-existent user', async () => {
+    it('should return error for non-existent user', async () => {
       const updateData = { name: 'Updated Name' };
 
       const response = await request(app.callback())
         .put('/api/users/999')
         .send(updateData)
-        .expect(404);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('error', 'User not found');
+      expect(response.body).toHaveProperty('code', ResponseCodes.USER_NOT_FOUND);
+      expect(response.body).toHaveProperty('msg', 'User not found');
+      expect(response.body).toHaveProperty('data', null);
     });
   });
 
@@ -216,25 +227,29 @@ describe('User Routes Unit Tests', () => {
         .delete('/api/users/1')
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('code', ResponseCodes.SUCCESS);
+      expect(response.body).toHaveProperty('msg', 'User deleted successfully');
       expect(response.body).toHaveProperty('data');
-      expect(response.body).toHaveProperty('message', 'User deleted successfully');
       expect(response.body.data).toHaveProperty('id', 1);
     });
 
-    it('should return 404 for non-existent user', async () => {
+    it('should return error for non-existent user', async () => {
       const response = await request(app.callback())
         .delete('/api/users/999')
-        .expect(404);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('error', 'User not found');
-    });    it('should remove user from users list', async () => {
+      expect(response.body).toHaveProperty('code', ResponseCodes.USER_NOT_FOUND);
+      expect(response.body).toHaveProperty('msg', 'User not found');
+      expect(response.body).toHaveProperty('data', null);
+    });
+
+    it('should remove user from users list', async () => {
       // First, verify user exists
       const beforeDelete = await request(app.callback())
         .get('/api/users/2')  // Use user 2 instead of 1 to avoid conflicts
         .expect(200);
 
+      expect(beforeDelete.body.code).toBe(ResponseCodes.SUCCESS);
       expect(beforeDelete.body.data).toHaveProperty('id', 2);
 
       // Delete user
@@ -245,9 +260,10 @@ describe('User Routes Unit Tests', () => {
       // Verify user is not in list
       const response = await request(app.callback())
         .get('/api/users/2')
-        .expect(404);
+        .expect(200);
 
-      expect(response.body).toHaveProperty('error', 'User not found');
+      expect(response.body.code).toBe(ResponseCodes.USER_NOT_FOUND);
+      expect(response.body.msg).toBe('User not found');
     });
   });
 });

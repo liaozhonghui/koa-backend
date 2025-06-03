@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import { User, CreateUserRequest, UpdateUserRequest, ApiResponse } from '../types';
+import { User, CreateUserRequest, UpdateUserRequest, ApiResponse, ResponseCodes } from '../types';
 import { logger } from '../utils/logger';
 
 const router = new Router({ prefix: '/api/users' });
@@ -18,9 +18,9 @@ router.get('/', async (ctx: any) => {
   });
   
   const response: ApiResponse<User[]> = {
-    success: true,
-    data: users,
-    count: users.length
+    code: ResponseCodes.SUCCESS,
+    msg: 'Users retrieved successfully',
+    data: users
   };
   
   ctx.body = response;
@@ -36,24 +36,25 @@ router.get('/:id', async (ctx: any) => {
   });
   
   const user = users.find(u => u.id === id);
-  
-  if (!user) {
+    if (!user) {
     logger.business.warn('User not found', { 
       requestId: (ctx as any).requestId,
       userId: id.toString()
     });
     
-    ctx.status = 404;
-    const response: ApiResponse = {
-      success: false,
-      error: 'User not found'
+    // Always return HTTP 200, but with error code
+    const response: ApiResponse<null> = {
+      code: ResponseCodes.USER_NOT_FOUND,
+      msg: 'User not found',
+      data: null
     };
     ctx.body = response;
     return;
   }
   
   const response: ApiResponse<User> = {
-    success: true,
+    code: ResponseCodes.SUCCESS,
+    msg: 'User retrieved successfully',
     data: user
   };
   
@@ -69,17 +70,17 @@ router.post('/', async (ctx: any) => {
     name,
     email 
   });
-  
-  if (!name || !email) {
+    if (!name || !email) {
     logger.business.warn('User creation failed - missing required fields', { 
       requestId: (ctx as any).requestId,
       missingFields: { name: !name, email: !email }
     });
     
-    ctx.status = 400;
-    const response: ApiResponse = {
-      success: false,
-      error: 'Name and email are required'
+    // Always return HTTP 200, but with validation error code
+    const response: ApiResponse<null> = {
+      code: ResponseCodes.VALIDATION_ERROR,
+      msg: 'Name and email are required',
+      data: null
     };
     ctx.body = response;
     return;
@@ -93,19 +94,17 @@ router.post('/', async (ctx: any) => {
   };
   
   users.push(newUser);
-  
-  logger.business.info('User created successfully', { 
+    logger.business.info('User created successfully', { 
     requestId: (ctx as any).requestId,
     userId: newUser.id.toString(),
     name: newUser.name,
     email: newUser.email 
   });
   
-  ctx.status = 201;
   const response: ApiResponse<User> = {
-    success: true,
-    data: newUser,
-    message: 'User created successfully'
+    code: ResponseCodes.CREATED,
+    msg: 'User created successfully',
+    data: newUser
   };
   
   ctx.body = response;
@@ -123,17 +122,17 @@ router.put('/:id', async (ctx: any) => {
   });
   
   const userIndex = users.findIndex(u => u.id === id);
-  
-  if (userIndex === -1) {
+    if (userIndex === -1) {
     logger.business.warn('User update failed - user not found', { 
       requestId: (ctx as any).requestId,
       userId: id.toString()
     });
     
-    ctx.status = 404;
-    const response: ApiResponse = {
-      success: false,
-      error: 'User not found'
+    // Always return HTTP 200, but with not found error code
+    const response: ApiResponse<null> = {
+      code: ResponseCodes.USER_NOT_FOUND,
+      msg: 'User not found',
+      data: null
     };
     ctx.body = response;
     return;
@@ -150,9 +149,9 @@ router.put('/:id', async (ctx: any) => {
   });
   
   const response: ApiResponse<User> = {
-    success: true,
-    data: users[userIndex]!,
-    message: 'User updated successfully'
+    code: ResponseCodes.SUCCESS,
+    msg: 'User updated successfully',
+    data: users[userIndex]!
   };
   
   ctx.body = response;
@@ -168,17 +167,17 @@ router.delete('/:id', async (ctx: any) => {
   });
   
   const userIndex = users.findIndex(u => u.id === id);
-  
-  if (userIndex === -1) {
+    if (userIndex === -1) {
     logger.business.warn('User deletion failed - user not found', { 
       requestId: (ctx as any).requestId,
       userId: id.toString()
     });
     
-    ctx.status = 404;
-    const response: ApiResponse = {
-      success: false,
-      error: 'User not found'
+    // Always return HTTP 200, but with not found error code
+    const response: ApiResponse<null> = {
+      code: ResponseCodes.USER_NOT_FOUND,
+      msg: 'User not found',
+      data: null
     };
     ctx.body = response;
     return;
@@ -196,9 +195,9 @@ router.delete('/:id', async (ctx: any) => {
   });
   
   const response: ApiResponse<User> = {
-    success: true,
-    data: deletedUser,
-    message: 'User deleted successfully'
+    code: ResponseCodes.SUCCESS,
+    msg: 'User deleted successfully',
+    data: deletedUser
   };
   
   ctx.body = response;

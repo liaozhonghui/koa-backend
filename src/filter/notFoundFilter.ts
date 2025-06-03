@@ -1,4 +1,5 @@
 import { logger } from '../utils/logger';
+import { ApiResponse, ResponseCodes } from '../types';
 
 /**
  * 404 Not Found filter
@@ -7,10 +8,10 @@ import { logger } from '../utils/logger';
 export function notFoundFilter() {
   return async (ctx: any, next: any) => {
     await next();
-    
-    // If no route was matched and no response body was set
+      // If no route was matched and no response body was set
     if (ctx.status === 404 || (!ctx.body && ctx.status === 404)) {
-      ctx.status = 404;
+      // Always return HTTP 200 with not found error code
+      ctx.status = 200;
       
       // Log the 404 with context
       logger.http.warn('Route not found', {
@@ -22,16 +23,13 @@ export function notFoundFilter() {
         referer: ctx.get('Referer')
       });
       
-      ctx.body = {
-        error: {
-          message: "Not Found",
-          status: 404,
-          path: ctx.url,
-          method: ctx.method,
-          timestamp: new Date().toISOString(),
-          requestId: ctx.requestId
-        }
+      const response: ApiResponse<null> = {
+        code: ResponseCodes.NOT_FOUND,
+        msg: "Route not found",
+        data: null
       };
+      
+      ctx.body = response;
     }
   };
 }

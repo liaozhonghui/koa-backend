@@ -1,9 +1,10 @@
 import { logger } from '../utils/logger';
-import { ApiError } from '../types';
+import { ApiError, ApiResponse, ResponseCodes } from '../types';
 
 /**
  * Global error handling filter
  * Catches all unhandled errors and formats them consistently
+ * Always returns HTTP 200 with standardized response format
  */
 export function errorFilter() {
   return async (ctx: any, next: any) => {
@@ -15,7 +16,8 @@ export function errorFilter() {
         status: err.status || err.statusCode || 500,
       };
 
-      ctx.status = error.status;
+      // Always return HTTP 200
+      ctx.status = 200;
       
       // Log the error with full context
       const errorContext = {
@@ -28,33 +30,38 @@ export function errorFilter() {
         stack: err.stack
       };
 
+      let responseCode: number;
+      let responseMessage: string;
+
       if (error.status >= 500) {
-        // Server errors
+        // Server errors - map to HTTP equivalent codes
+        responseCode = ResponseCodes.INTERNAL_SERVER_ERROR;
+        responseMessage = process.env["NODE_ENV"] === 'production' 
+          ? "Internal Server Error" 
+          : error.message;
+        
         logger.http.error('Server error occurred', err, errorContext);
-        
-        ctx.body = {
-          error: {
-            message: process.env["NODE_ENV"] === 'production' 
-              ? "Internal Server Error" 
-              : error.message,
-            status: error.status,
-            timestamp: new Date().toISOString(),
-            requestId: ctx.requestId
-          }
-        };
       } else if (error.status >= 400) {
-        // Client errors
-        logger.http.warn('Client error occurred', errorContext);
+        // Client errors - map to HTTP equivalent codes
+        responseCode = error.status; // Keep original HTTP status as code
+        responseMessage = error.message;
         
-        ctx.body = {
-          error: {
-            message: error.message,
-            status: error.status,
-            timestamp: new Date().toISOString(),
-            requestId: ctx.requestId
-          }
-        };
+        logger.http.warn('Client error occurred', errorContext);
+      } else {
+        // Default case
+        responseCode = ResponseCodes.INTERNAL_SERVER_ERROR;
+        responseMessage = "Unknown error occurred";
+        
+        logger.http.error('Unknown error occurred', err, errorContext);
       }
+
+      const response: ApiResponse<null> = {
+        code: responseCode,
+        msg: responseMessage,
+        data: null
+      };
+
+      ctx.body = response;
 
       // Emit error for other error handlers if needed
       ctx.app.emit('error', err, ctx);

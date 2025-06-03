@@ -39,23 +39,19 @@ export class UserService {  /**
       errors
     };
   }
-
   /**
    * Creates a standardized API response
    */
   static createResponse<T>(
-    success: boolean,
-    data?: T,
-    message?: string,
-    error?: string
+    code: number,
+    message: string,
+    data: T
   ): ApiResponse<T> {
-    const response: ApiResponse<T> = { success };
-    
-    if (data !== undefined) response.data = data;
-    if (message) response.message = message;
-    if (error) response.error = error;
-    
-    return response;
+    return {
+      code,
+      msg: message,
+      data
+    };
   }
 
   /**
@@ -78,14 +74,14 @@ export class UserService {  /**
 /**
  * Error handling utilities
  */
-export class ErrorHandler {
-  /**
+export class ErrorHandler {  /**
    * Creates a standardized error response
    */
-  static createErrorResponse(message: string): ApiResponse {
+  static createErrorResponse(message: string, code: number = 500): ApiResponse<null> {
     return {
-      success: false,
-      error: message
+      code,
+      msg: message,
+      data: null
     };
   }
 
@@ -127,3 +123,9 @@ export class Logger {
     console.warn(`[${this.formatTimestamp()}] WARN: ${message}`, meta ? JSON.stringify(meta) : '');
   }
 }
+
+// Export logger from logger.ts
+export { logger } from './logger';
+
+// Export response utilities
+export * from './response';

@@ -5,7 +5,7 @@ import cors from "@koa/cors";
 import json from "koa-json";
 import appConfig from "./config"; // Import the new config
 import Database from "./database"; // Import database
-import { HealthCheckResponse } from "./types";
+import { HealthCheckData, ApiResponse, ResponseCodes } from "./types";
 import { logger as appLogger } from "./utils/logger";
 
 // Import middleware
@@ -37,11 +37,11 @@ router.get("/", async (ctx: any) => {
   appLogger.app.info('Health check requested', { 
     requestId: (ctx as any).requestId 
   });
-  
-  // Get database connection status
+    // Get database connection status
   const database = Database.getInstance();
   const dbStatus = database.getConnectionStatus();
-    const response: HealthCheckResponse = {
+  
+  const healthData: HealthCheckData = {
     message: "Koa Backend API is running!",
     version: "1.0.0",
     timestamp: new Date().toISOString(),
@@ -56,6 +56,12 @@ router.get("/", async (ctx: any) => {
           ? `reconnecting (${dbStatus.reconnectAttempts}/${dbStatus.maxReconnectAttempts})` 
           : 'disconnected'
     }
+  };
+
+  const response: ApiResponse<HealthCheckData> = {
+    code: ResponseCodes.SUCCESS,
+    msg: 'Health check completed successfully',
+    data: healthData
   };
 
   ctx.body = response;

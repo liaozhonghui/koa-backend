@@ -98,25 +98,22 @@ describe('UserService Unit Tests', () => {
       expect(result.errors).toHaveLength(2);
     });
   });
-
   describe('createResponse', () => {
     it('should create success response with data', () => {
       const data = { id: 1, name: 'Test' };
-      const response = UserService.createResponse(true, data, 'Success');
+      const response = UserService.createResponse(200, 'Success', data);
 
-      expect(response.success).toBe(true);
+      expect(response.code).toBe(200);
+      expect(response.msg).toBe('Success');
       expect(response.data).toEqual(data);
-      expect(response.message).toBe('Success');
-      expect(response.error).toBeUndefined();
     });
 
     it('should create error response', () => {
-      const response = UserService.createResponse(false, undefined, undefined, 'Error occurred');
+      const response = UserService.createResponse(500, 'Error occurred', null);
 
-      expect(response.success).toBe(false);
-      expect(response.data).toBeUndefined();
-      expect(response.message).toBeUndefined();
-      expect(response.error).toBe('Error occurred');
+      expect(response.code).toBe(500);
+      expect(response.msg).toBe('Error occurred');
+      expect(response.data).toBe(null);
     });
   });
 
@@ -159,8 +156,19 @@ describe('ErrorHandler Unit Tests', () => {
       const message = 'Something went wrong';
       const response = ErrorHandler.createErrorResponse(message);
 
-      expect(response.success).toBe(false);
-      expect(response.error).toBe(message);
+      expect(response.code).toBe(500);
+      expect(response.msg).toBe(message);
+      expect(response.data).toBe(null);
+    });
+
+    it('should create error response with custom code', () => {
+      const message = 'Validation error';
+      const code = 400;
+      const response = ErrorHandler.createErrorResponse(message, code);
+
+      expect(response.code).toBe(code);
+      expect(response.msg).toBe(message);
+      expect(response.data).toBe(null);
     });
   });
 

@@ -17,11 +17,9 @@ export interface UpdateUserRequest {
 }
 
 export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  count?: number;
+  code: number;
+  msg: string;
+  data: T;
 }
 
 export interface ApiError {
@@ -29,7 +27,7 @@ export interface ApiError {
   status: number;
 }
 
-export interface HealthCheckResponse {
+export interface HealthCheckData {
   message: string;
   version: string;
   timestamp: string;
@@ -42,7 +40,7 @@ export interface HealthCheckResponse {
   };
 }
 
-export interface StatusResponse {
+export interface StatusData {
   status: string;
   uptime: number;
   timestamp: string;
@@ -50,7 +48,7 @@ export interface StatusResponse {
   version: string;
 }
 
-export interface InfoResponse {
+export interface InfoData {
   name: string;
   description: string;
   version: string;
@@ -58,10 +56,32 @@ export interface InfoResponse {
   endpoints: Record<string, string>;
 }
 
-export interface EchoResponse {
-  success: boolean;
+export interface EchoData {
   echo: any;
   timestamp: string;
   method: string;
   url: string;
 }
+
+// API Response Codes
+export const ResponseCodes = {
+  // HTTP equivalent codes (200-500)
+  SUCCESS: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  INTERNAL_SERVER_ERROR: 500,
+
+  // Business logic codes (600-1000)
+  VALIDATION_ERROR: 600,
+  USER_NOT_FOUND: 601,
+  USER_ALREADY_EXISTS: 602,
+  INVALID_EMAIL_FORMAT: 603,
+  DATABASE_CONNECTION_ERROR: 700,
+  EXTERNAL_SERVICE_ERROR: 701,
+} as const;
