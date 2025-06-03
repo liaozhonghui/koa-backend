@@ -1,5 +1,5 @@
 import { UserService } from '../src/modules/user/user.service';
-import { ErrorHandler } from '../src/middleware/errorHandler';
+import { createErrorResponse, handleError } from '../src/middleware/errorHandler';
 import { SimpleLogger as Logger } from '../src/singleton/logger';
 import { User } from '../src/types';
 
@@ -156,7 +156,7 @@ describe('ErrorHandler Unit Tests', () => {
   describe('createErrorResponse', () => {
     it('should create standardized error response', () => {
       const message = 'Something went wrong';
-      const response = ErrorHandler.createErrorResponse(message);
+      const response = createErrorResponse(message);
 
       expect(response.code).toBe(500);
       expect(response.msg).toBe(message);
@@ -166,7 +166,7 @@ describe('ErrorHandler Unit Tests', () => {
     it('should create error response with custom code', () => {
       const message = 'Validation error';
       const code = 400;
-      const response = ErrorHandler.createErrorResponse(message, code);
+      const response = createErrorResponse(message, code);
 
       expect(response.code).toBe(code);
       expect(response.msg).toBe(message);
@@ -177,7 +177,7 @@ describe('ErrorHandler Unit Tests', () => {
   describe('handleError', () => {
     it('should handle Error instances', () => {
       const error = new Error('Test error');
-      const result = ErrorHandler.handleError(error);
+      const result = handleError(error);
 
       expect(result.message).toBe('Test error');
       expect(result.status).toBe(500);
@@ -185,7 +185,7 @@ describe('ErrorHandler Unit Tests', () => {
 
     it('should handle unknown errors', () => {
       const error = 'String error';
-      const result = ErrorHandler.handleError(error);
+      const result = handleError(error);
 
       expect(result.message).toBe('An unknown error occurred');
       expect(result.status).toBe(500);
