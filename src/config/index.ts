@@ -1,5 +1,7 @@
-import fs from "fs";
-import path from "path";
+import { defaultConfig } from "./default";
+import { localConfig } from "./local";
+import { prodConfig } from "./prod";
+import { preConfig } from "./pre";
 
 interface DatabaseConfig {
   host: string;
@@ -54,7 +56,7 @@ interface Config {
   bodyParser: BodyParserConfig;
   session: SessionConfig;
   security: SecurityConfig;
-  database: DatabaseConfig; // Make required after validation
+  database: DatabaseConfig;
   PORT: number;
   NODE_ENV: string;
   LOG_LEVEL: string;
@@ -62,22 +64,24 @@ interface Config {
 }
 
 const env = process.env["NODE_ENV"] || "local";
-const defaultConfigPath = path.join(__dirname, "default.json");
-const envConfigPath = path.join(__dirname, `${env}.json`);
 
-// Load common configuration (CORS, JSON, etc.)
-let config: any = JSON.parse(fs.readFileSync(defaultConfigPath, "utf-8"));
+// Environment config mapping
+const envConfigs = {
+  local: localConfig,
+  production: prodConfig,
+  "pre-production": preConfig,
+  prod: prodConfig,
+  pre: preConfig
+};
 
-// Load environment-specific configuration (DB, PORT, LOG_LEVEL, etc.)
-if (fs.existsSync(envConfigPath)) {
-  const envConfig = JSON.parse(fs.readFileSync(envConfigPath, "utf-8"));
-  // Deep merge environment-specific config
-  config = { 
-    ...config, 
-    ...envConfig, 
-    database: envConfig.database || config.database
-  };
-}
+// Get environment-specific config
+const envConfig = envConfigs[env as keyof typeof envConfigs] || localConfig;
+
+// Merge default config with environment-specific config
+let config: any = {
+  ...defaultConfig,
+  ...envConfig
+};
 
 // Override with environment variables if present
 config.NODE_ENV = process.env["NODE_ENV"] || config.NODE_ENV || env;
