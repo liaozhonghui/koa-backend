@@ -1,9 +1,9 @@
 // Test setup file
 // This file runs before all tests
 
-import path from "path";
+// import path from "path";
 // import { config } from 'dotenv';
-import config from "../src/config";
+// import config from "../src/config";
 
 // Load environment variables from .env.test file
 // config({ path: path.resolve(__dirname, '.env.test') });

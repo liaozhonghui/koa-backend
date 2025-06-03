@@ -171,7 +171,6 @@ npm run test:coverage
 - **koa-bodyparser** - Body parsing middleware
 - **@koa/cors** - CORS middleware
 - **koa-logger** - Logging middleware
-- **dotenv** - Environment variable management
 - **ts-node** - TypeScript execution for development
 - **nodemon** - Development server with hot reload
 - **Jest** - Testing framework with TypeScript support

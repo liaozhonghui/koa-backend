@@ -2,7 +2,8 @@
   "name": "koa-backend",
   "version": "1.0.0",
   "description": "A modern web backend built with Koa 3.0.0",
-  "main": "dist/app.js",  "scripts": {
+  "main": "dist/app.js",
+  "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "nodemon --exec ts-node src/app.ts",
@@ -23,7 +24,6 @@
   "license": "MIT",
   "dependencies": {
     "@koa/cors": "^5.0.0",
-    "dotenv": "^16.4.5",
     "koa": "^3.0.0",
     "koa-bodyparser": "^4.4.1",
     "koa-json": "^2.0.2",
