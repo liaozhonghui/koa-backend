@@ -87,6 +87,11 @@ let config: any = {
 config.NODE_ENV = process.env["NODE_ENV"] || config.NODE_ENV || env;
 config.LOG_LEVEL = process.env["LOG_LEVEL"] || config.LOG_LEVEL || "info";
 config.PORT = parseInt(process.env["PORT"] || "") || config.PORT || 3000;
+// Override JWT configuration with environment variables if provided
+config["jwt"] = {
+  secret: process.env["JWT_SECRET"] || config["jwt"].secret,
+  expiresIn: process.env["JWT_EXPIRES_IN"] || config["jwt"].expiresIn
+};
 
 // Ensure required environment-specific configs exist
 if (!config.database) {

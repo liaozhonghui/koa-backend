@@ -29,5 +29,9 @@ export const defaultConfig = {
       windowMs: 900000,
       max: 100
     }
+  },
+  jwt: {
+    secret: 'your-super-secret-jwt-key-change-in-production',
+    expiresIn: '7d'
   }
 } as const;
