@@ -4,15 +4,21 @@ import { ApiResponse, ResponseCodes } from '../../types';
 import { logger } from '../../singleton/logger';
 
 export class UserController {
+  private userService: UserService;
+
+  constructor(userService: UserService) {
+    this.userService = userService;
+  }
+
   /**
    * GET /api/users - Get all users
    */
-  static async getAllUsers(ctx: any) {
+  async getAllUsers(ctx: any) {
     logger.business.info('Fetching all users', { 
       requestId: (ctx as any).requestId
     });
     
-    const users = await UserService.getAllUsers();
+    const users = await this.userService.getAllUsers();
     
     const response: ApiResponse<User[]> = {
       code: ResponseCodes.SUCCESS,
@@ -22,11 +28,10 @@ export class UserController {
     
     ctx.body = response;
   }
-
   /**
    * GET /api/users/:id - Get user by ID
    */
-  static async getUserById(ctx: any) {
+  async getUserById(ctx: any) {
     const id = parseInt(ctx.params['id'] as string);
     
     logger.business.info('Fetching user by ID', { 
@@ -34,7 +39,7 @@ export class UserController {
       userId: id.toString()
     });
     
-    const user = await UserService.getUserById(id);
+    const user = await this.userService.getUserById(id);
     
     if (!user) {
       logger.business.warn('User not found', { 
@@ -59,11 +64,10 @@ export class UserController {
     
     ctx.body = response;
   }
-
   /**
    * POST /api/users - Create new user
    */
-  static async createUser(ctx: any) {
+  async createUser(ctx: any) {
     const userData: CreateUserRequest = ctx.request.body as CreateUserRequest;
     const { name, email } = userData;
     
@@ -74,7 +78,7 @@ export class UserController {
     });
 
     // Validate user data
-    const validationError = UserService.validateUserData(userData);
+    const validationError = this.userService.validateUserData(userData);
     if (validationError) {
       logger.business.warn('User creation failed - validation error', { 
         requestId: (ctx as any).requestId,
@@ -106,7 +110,7 @@ export class UserController {
     }
     
     try {
-      const newUser = await UserService.createUser(userData);
+      const newUser = await this.userService.createUser(userData);
       
       logger.business.info('User created successfully', { 
         requestId: (ctx as any).requestId,
@@ -136,11 +140,10 @@ export class UserController {
       ctx.body = response;
     }
   }
-
   /**
    * PUT /api/users/:id - Update user
    */
-  static async updateUser(ctx: any) {
+  async updateUser(ctx: any) {
     const id = parseInt(ctx.params['id'] as string);
     const updateData: UpdateUserRequest = ctx.request.body as UpdateUserRequest;
     const { name, email } = updateData;
@@ -152,7 +155,7 @@ export class UserController {
     });
 
     // Validate update data
-    const validationError = UserService.validateUserData(updateData);
+    const validationError = this.userService.validateUserData(updateData);
     if (validationError) {
       logger.business.warn('User update failed - validation error', { 
         requestId: (ctx as any).requestId,
@@ -170,7 +173,7 @@ export class UserController {
     }
     
     try {
-      const updatedUser = await UserService.updateUser(id, updateData);
+      const updatedUser = await this.userService.updateUser(id, updateData);
       
       if (!updatedUser) {
         logger.business.warn('User update failed - user not found', { 
@@ -215,11 +218,10 @@ export class UserController {
       ctx.body = response;
     }
   }
-
   /**
    * DELETE /api/users/:id - Delete user
    */
-  static async deleteUser(ctx: any) {
+  async deleteUser(ctx: any) {
     const id = parseInt(ctx.params['id'] as string);
     
     logger.business.info('Deleting user', { 
@@ -228,7 +230,7 @@ export class UserController {
     });
     
     try {
-      const deletedUser = await UserService.deleteUser(id);
+      const deletedUser = await this.userService.deleteUser(id);
       
       if (!deletedUser) {
         logger.business.warn('User deletion failed - user not found', { 

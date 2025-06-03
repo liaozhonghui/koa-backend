@@ -4,6 +4,12 @@ import { SimpleLogger as Logger } from '../src/singleton/logger';
 import { User } from '../src/types';
 
 describe('UserService Unit Tests', () => {
+  let userService: UserService;
+
+  beforeEach(() => {
+    userService = new UserService();
+  });
+
   describe('isValidEmail', () => {
     it('should return true for valid email addresses', () => {
       const validEmails = [
@@ -14,9 +20,11 @@ describe('UserService Unit Tests', () => {
       ];
 
       validEmails.forEach(email => {
-        expect(UserService.isValidEmail(email)).toBe(true);
+        expect(userService.isValidEmail(email)).toBe(true);
       });
-    });    it('should return false for invalid email addresses', () => {
+    });
+
+    it('should return false for invalid email addresses', () => {
       const invalidEmails = [
         'invalid-email',
         '@example.com',
@@ -29,7 +37,7 @@ describe('UserService Unit Tests', () => {
       ];
 
       invalidEmails.forEach(email => {
-        const result = UserService.isValidEmail(email);
+        const result = userService.isValidEmail(email);
         expect(result).toBe(false);
       });
     });
@@ -42,7 +50,7 @@ describe('UserService Unit Tests', () => {
         email: 'john@example.com'
       };
 
-      const result = UserService.validateCreateUser(userData);
+      const result = userService.validateCreateUser(userData);
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
@@ -52,7 +60,7 @@ describe('UserService Unit Tests', () => {
         email: 'john@example.com'
       };
 
-      const result = UserService.validateCreateUser(userData);
+      const result = userService.validateCreateUser(userData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('Name is required and must be a non-empty string');
     });
@@ -63,7 +71,7 @@ describe('UserService Unit Tests', () => {
         email: 'john@example.com'
       };
 
-      const result = UserService.validateCreateUser(userData);
+      const result = userService.validateCreateUser(userData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('Name is required and must be a non-empty string');
     });
@@ -73,7 +81,7 @@ describe('UserService Unit Tests', () => {
         name: 'John Doe'
       };
 
-      const result = UserService.validateCreateUser(userData);
+      const result = userService.validateCreateUser(userData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('Email is required and must be a string');
     });
@@ -84,7 +92,7 @@ describe('UserService Unit Tests', () => {
         email: 'invalid-email'
       };
 
-      const result = UserService.validateCreateUser(userData);
+      const result = userService.validateCreateUser(userData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('Email must be a valid email address');
     });
@@ -95,15 +103,16 @@ describe('UserService Unit Tests', () => {
         email: 'invalid'
       };
 
-      const result = UserService.validateCreateUser(userData);
+      const result = userService.validateCreateUser(userData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveLength(2);
     });
   });
+
   describe('createResponse', () => {
     it('should create success response with data', () => {
       const data = { id: 1, name: 'Test' };
-      const response = UserService.createResponse(200, 'Success', data);
+      const response = userService.createResponse(200, 'Success', data);
 
       expect(response.code).toBe(200);
       expect(response.msg).toBe('Success');
@@ -111,7 +120,7 @@ describe('UserService Unit Tests', () => {
     });
 
     it('should create error response', () => {
-      const response = UserService.createResponse(500, 'Error occurred', null);
+      const response = userService.createResponse(500, 'Error occurred', null);
 
       expect(response.code).toBe(500);
       expect(response.msg).toBe('Error occurred');
@@ -128,7 +137,7 @@ describe('UserService Unit Tests', () => {
         createdAt: new Date()
       };
 
-      const sanitized = UserService.sanitizeUser(user);
+      const sanitized = userService.sanitizeUser(user);
       expect(sanitized).toEqual(user); // In this case, no sensitive data to remove
     });
   });
@@ -136,7 +145,7 @@ describe('UserService Unit Tests', () => {
   describe('generateId', () => {
     it('should generate next ID for empty array', () => {
       const users: User[] = [];
-      const newId = UserService.generateId(users);
+      const newId = userService.generateId(users);
       expect(newId).toBe(1);
     });
 
@@ -146,7 +155,7 @@ describe('UserService Unit Tests', () => {
         { id: 3, name: 'User 3', email: 'user3@example.com', createdAt: new Date() },
         { id: 2, name: 'User 2', email: 'user2@example.com', createdAt: new Date() }
       ];
-      const newId = UserService.generateId(users);
+      const newId = userService.generateId(users);
       expect(newId).toBe(4);
     });
   });

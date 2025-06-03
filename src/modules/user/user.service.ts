@@ -4,15 +4,18 @@ import { logger } from '../../singleton/logger';
 
 export class UserService {
   // Mock data for demonstration - in real app this would be database operations
-  private static users: User[] = [
+  private users: User[] = [
     { id: 1, name: 'John Doe', email: 'john@example.com', createdAt: new Date() },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', createdAt: new Date() }
   ];
 
+  constructor() {
+    // Constructor - no need to inject DATABASE since it's a singleton
+  }
   /**
    * Validates user email format
    */
-  static isValidEmail(email: string): boolean {
+  isValidEmail(email: string): boolean {
     // Basic but effective email validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     
@@ -27,7 +30,7 @@ export class UserService {
   /**
    * Validates user data for creation
    */
-  static validateCreateUser(data: any): { isValid: boolean; errors: string[] } {
+  validateCreateUser(data: any): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) {
@@ -45,11 +48,10 @@ export class UserService {
       errors
     };
   }
-
   /**
    * Creates a standardized API response
    */
-  static createResponse<T>(
+  createResponse<T>(
     code: number,
     message: string,
     data: T
@@ -64,7 +66,7 @@ export class UserService {
   /**
    * Sanitizes user data by removing sensitive information
    */
-  static sanitizeUser(user: User): Omit<User, 'id'> & { id?: number } {
+  sanitizeUser(user: User): Omit<User, 'id'> & { id?: number } {
     const { ...sanitizedUser } = user;
     return sanitizedUser;
   }
@@ -72,7 +74,7 @@ export class UserService {
   /**
    * Generates a unique ID (simple implementation for demo)
    */
-  static generateId(existingUsers: User[]): number {
+  generateId(existingUsers: User[]): number {
     const maxId = existingUsers.reduce((max, user) => Math.max(max, user.id), 0);
     return maxId + 1;
   }
@@ -80,18 +82,17 @@ export class UserService {
   /**
    * Get all users
    */
-  static async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<User[]> {
     logger.business.debug('Fetching all users', { 
       userCount: this.users.length 
     });
     
     return this.users;
   }
-
   /**
    * Get user by ID
    */
-  static async getUserById(id: number): Promise<User | null> {
+  async getUserById(id: number): Promise<User | null> {
     logger.business.debug('Fetching user by ID', { 
       userId: id.toString()
     });
@@ -107,11 +108,10 @@ export class UserService {
     
     return user;
   }
-
   /**
    * Create new user
    */
-  static async createUser(userData: CreateUserRequest): Promise<User> {
+  async createUser(userData: CreateUserRequest): Promise<User> {
     const { name, email } = userData;
     
     logger.business.info('Creating new user', { 
@@ -140,11 +140,10 @@ export class UserService {
     
     return newUser;
   }
-
   /**
    * Update user
    */
-  static async updateUser(id: number, updateData: UpdateUserRequest): Promise<User | null> {
+  async updateUser(id: number, updateData: UpdateUserRequest): Promise<User | null> {
     const { name, email } = updateData;
     
     logger.business.info('Updating user', { 
@@ -172,11 +171,10 @@ export class UserService {
     
     return this.users[userIndex]!;
   }
-
   /**
    * Delete user
    */
-  static async deleteUser(id: number): Promise<User | null> {
+  async deleteUser(id: number): Promise<User | null> {
     logger.business.info('Deleting user', { 
       userId: id.toString()
     });
@@ -202,11 +200,10 @@ export class UserService {
     
     return deletedUser;
   }
-
   /**
    * Validate user data
    */
-  static validateUserData(data: CreateUserRequest | UpdateUserRequest): string | null {
+  validateUserData(data: CreateUserRequest | UpdateUserRequest): string | null {
     if ('name' in data && data.name !== undefined) {
       if (typeof data.name !== 'string' || data.name.trim().length === 0) {
         return 'Name must be a non-empty string';
