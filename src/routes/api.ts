@@ -1,6 +1,6 @@
 import Router from 'koa-router';
 import { StatusData, InfoData, EchoData, ApiResponse, ResponseCodes } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '../singleton/logger';
 
 const router = new Router({ prefix: '/api' });
 

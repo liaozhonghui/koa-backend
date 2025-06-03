@@ -1,4 +1,4 @@
-import Database from '../src/database';
+import Database from '../src/singleton/database';
 
 describe('Database Error Handling and Reconnection Tests', () => {
   let database: Database;

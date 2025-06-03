@@ -2,3 +2,4 @@
 export { httpLogger, securityLogger } from './httpLogger';
 export { responseTime } from './responseTime';
 export { authMiddleware, optionalAuthMiddleware } from './auth';
+export { ErrorHandler } from './errorHandler';

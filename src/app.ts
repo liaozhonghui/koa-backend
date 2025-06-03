@@ -4,9 +4,9 @@ import bodyParser from "koa-bodyparser";
 import cors from "@koa/cors";
 import json from "koa-json";
 import appConfig from "./config"; // Import the new config
-import Database from "./database"; // Import database
+import Database from "./singleton/database"; // Import database
 import { HealthCheckData, ApiResponse, ResponseCodes } from "./types";
-import { logger as appLogger } from "./utils/logger";
+import { logger as appLogger } from "./singleton/logger";
 
 // Import middleware
 import { httpLogger, securityLogger, responseTime } from "./middleware";

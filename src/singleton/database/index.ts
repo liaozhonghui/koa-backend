@@ -1,6 +1,6 @@
 import { Pool, PoolConfig } from 'pg';
-import config from '../config';
-import { logger } from '../utils/logger';
+import config from '../../config';
+import { logger } from '../logger';
 
 interface DatabaseError extends Error {
   code?: string;
@@ -33,7 +33,9 @@ class Database {
       max: config.database.max || 10,
       idleTimeoutMillis: config.database.idleTimeoutMillis || 30000,
       connectionTimeoutMillis: config.database.connectionTimeoutMillis || 2000,
-    };    this.pool = new Pool(dbConfig);
+    };
+
+    this.pool = new Pool(dbConfig);
 
     // 监听连接成功
     this.pool.on('connect', () => {
@@ -44,12 +46,15 @@ class Database {
         port: config.database.port,
         dbname: config.database.dbname
       });
-        // 清除重连定时器
+
+      // 清除重连定时器
       if (this.reconnectTimer) {
         clearTimeout(this.reconnectTimer);
         this.reconnectTimer = null;
       }
-    });    // 监听连接错误 - 不要直接退出应用
+    });
+
+    // 监听连接错误 - 不要直接退出应用
     this.pool.on('error', (err: DatabaseError) => {
       this.isConnected = false;
       logger.database.error('Database connection error occurred', err, {
@@ -76,7 +81,9 @@ class Database {
   private scheduleReconnect(): void {
     if (this.reconnectTimer) {
       return; // 已经有重连计划在进行中
-    }    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+    }
+
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       logger.database.error('Maximum reconnection attempts reached', undefined, {
         maxReconnectAttempts: this.maxReconnectAttempts,
         host: config.database.host,
@@ -84,7 +91,9 @@ class Database {
         dbname: config.database.dbname
       });
       return;
-    }    this.reconnectAttempts++;
+    }
+
+    this.reconnectAttempts++;
     logger.database.info('Scheduling database reconnection', {
       attempt: this.reconnectAttempts,
       maxAttempts: this.maxReconnectAttempts,
@@ -98,6 +107,7 @@ class Database {
       this.reconnect();
     }, this.reconnectInterval);
   }
+
   private async reconnect(): Promise<void> {
     try {
       logger.database.info('Attempting database reconnection', {
@@ -121,7 +131,8 @@ class Database {
       if (!connected) {
         throw new Error('Connection test failed after reconnection');
       }
-        } catch (error) {
+
+    } catch (error) {
       logger.database.error('Database reconnection attempt failed', error as Error, {
         attempt: this.reconnectAttempts,
         maxAttempts: this.maxReconnectAttempts,
@@ -135,6 +146,7 @@ class Database {
       this.reconnectTimer = null;
     }
   }
+
   public static getInstance(): Database {
     if (!Database.instance) {
       Database.instance = new Database();
@@ -161,6 +173,7 @@ class Database {
       maxReconnectAttempts: this.maxReconnectAttempts
     };
   }
+
   public async query(text: string, params?: any[]): Promise<any> {
     if (!this.isConnected) {
       throw new Error('Database is not connected. Please wait for reconnection or check database server.');
@@ -192,7 +205,9 @@ class Database {
     } finally {
       client.release();
     }
-  }  public async testConnection(): Promise<boolean> {
+  }
+
+  public async testConnection(): Promise<boolean> {
     try {
       // 直接使用池连接进行测试，而不是通过query方法
       const client = await this.pool.connect();
@@ -219,6 +234,7 @@ class Database {
       return false;
     }
   }
+
   public async close(): Promise<void> {
     // 清除重连定时器
     if (this.reconnectTimer) {

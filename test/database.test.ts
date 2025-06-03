@@ -1,4 +1,4 @@
-import Database from '../src/database';
+import Database from '../src/singleton/database';
 import config from '../src/config';
 
 describe('Database Connection Tests', () => {

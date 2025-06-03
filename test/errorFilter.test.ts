@@ -2,7 +2,7 @@ import { errorFilter } from '../src/filter/errorFilter';
 import { ResponseCodes } from '../src/types';
 
 // Mock the logger to avoid dependencies
-jest.mock('../src/utils/logger', () => ({
+jest.mock('../src/singleton/logger', () => ({
   logger: {
     http: {
       error: jest.fn(),

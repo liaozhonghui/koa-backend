@@ -3,7 +3,7 @@
  * This is a basic test to verify the endpoints work correctly
  */
 
-import { JWTService } from '../src/utils/jwt';
+import { JWTService } from '../src/singleton/jwt';
 
 describe('JWT Service', () => {
   describe('generateToken', () => {

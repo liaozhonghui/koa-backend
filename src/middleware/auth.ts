@@ -1,6 +1,6 @@
-import { JWTService } from '../utils/jwt';
+import { JWTService } from '../singleton/jwt';
 import { ApiResponse, ResponseCodes } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '../singleton/logger';
 
 /**
  * JWT Authentication middleware

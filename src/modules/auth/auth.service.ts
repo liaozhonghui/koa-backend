@@ -1,9 +1,10 @@
 import { Pool } from 'pg';
-import Database from '../singleton/database';
-import { AppUser, LoginRequest } from '../types';
-import { logger } from '../singleton/logger';
+import Database from '../../singleton/database';
+import { LoginRequest } from './auth.entity';
+import { AppUser } from '../user/user.entity';
+import { logger } from '../../singleton/logger';
 
-export class UserAuthService {
+export class AuthService {
   private static db: Pool;
 
   static async initialize() {
@@ -31,22 +32,24 @@ export class UserAuthService {
           subscription, subscription_times, last_active_time, activedays,
           user_consecutive_active_days, user_category_ids, ref
         FROM public."user" 
-        WHERE device_id = $1 AND (is_deleted = false OR is_deleted IS NULL)
+        WHERE device_id = $1 AND is_deleted = false
       `;
 
       const result = await this.db.query(query, [deviceId]);
       
-      if (result.rows.length > 0) {
-        const user = result.rows[0] as AppUser;
-        logger.database.debug('User found by device_id', {
-          device_id: deviceId,
-          user_id: user.user_id
-        });
-        return user;
+      if (result.rows.length === 0) {
+        logger.business.debug('User not found by device_id', { device_id: deviceId });
+        return null;
       }
 
-      logger.database.debug('No user found with device_id', { device_id: deviceId });
-      return null;    } catch (error) {
+      const user = result.rows[0] as AppUser;
+      logger.business.debug('User found by device_id', { 
+        user_id: user.user_id, 
+        device_id: user.device_id 
+      });
+      
+      return user;
+    } catch (error) {
       logger.database.error('Error finding user by device_id', error as Error, { device_id: deviceId });
       throw error;
     }
@@ -115,7 +118,8 @@ export class UserAuthService {
         device_brand: newUser.device_brand
       });
 
-      return newUser;    } catch (error) {
+      return newUser;
+    } catch (error) {
       logger.database.error('Error creating user', error as Error, {
         device_id: loginData.device_id,
         app_id: loginData.app_id
@@ -134,8 +138,6 @@ export class UserAuthService {
       }
 
       const now = Date.now();
-      const clientVersionInt = loginData.client_version ? 
-        parseInt(loginData.client_version.replace(/\./g, '')) : null;
 
       const query = `
         UPDATE public."user" 
@@ -145,12 +147,15 @@ export class UserAuthService {
           client_version_int = $3,
           os_version = $4,
           firebase_token = $5,
-          ip = COALESCE($6, ip),
-          carrier = COALESCE($7, carrier)
+          ip = $6,
+          carrier = $7
         WHERE user_id = $8
       `;
 
-      await this.db.query(query, [
+      const clientVersionInt = loginData.client_version ? 
+        parseInt(loginData.client_version.replace(/\./g, '')) : null;
+
+      const values = [
         now,                                       // last_active_time
         loginData.client_version,                  // client_version
         clientVersionInt,                          // client_version_int
@@ -159,14 +164,65 @@ export class UserAuthService {
         ip || null,                                // ip
         loginData.carrier || null,                 // carrier
         userId                                     // user_id
-      ]);
+      ];
+
+      await this.db.query(query, values);
 
       logger.business.debug('User login info updated', {
         user_id: userId,
         client_version: loginData.client_version
-      });    } catch (error) {
+      });
+    } catch (error) {
       logger.database.error('Error updating user login info', error as Error, { user_id: userId });
       throw error;
     }
+  }
+
+  /**
+   * Validate login request data
+   */
+  static validateLoginRequest(data: LoginRequest): string | null {
+    if (!data.device_id || typeof data.device_id !== 'string') {
+      return 'device_id is required and must be a string';
+    }
+
+    if (!data.app_id || typeof data.app_id !== 'string') {
+      return 'app_id is required and must be a string';
+    }
+
+    if (!data.device_brand || typeof data.device_brand !== 'string') {
+      return 'device_brand is required and must be a string';
+    }
+
+    if (!data.device_model || typeof data.device_model !== 'string') {
+      return 'device_model is required and must be a string';
+    }
+
+    if (!data.os || typeof data.os !== 'string') {
+      return 'os is required and must be a string';
+    }
+
+    if (!data.os_version || typeof data.os_version !== 'string') {
+      return 'os_version is required and must be a string';
+    }
+
+    if (!data.client_version || typeof data.client_version !== 'string') {
+      return 'client_version is required and must be a string';
+    }
+
+    return null;
+  }
+
+  /**
+   * Get client IP address from request
+   */
+  static getClientIP(ctx: any): string {
+    return (
+      ctx.get('X-Forwarded-For') ||
+      ctx.get('X-Real-IP') ||
+      ctx.get('X-Client-IP') ||
+      ctx.ip ||
+      'unknown'
+    );
   }
 }

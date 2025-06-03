@@ -1,4 +1,6 @@
-import { UserService, ErrorHandler, Logger } from '../src/utils';
+import { UserService } from '../src/modules/user/user.service';
+import { ErrorHandler } from '../src/middleware/errorHandler';
+import { SimpleLogger as Logger } from '../src/singleton/logger';
 import { User } from '../src/types';
 
 describe('UserService Unit Tests', () => {

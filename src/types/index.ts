@@ -1,20 +1,8 @@
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  createdAt: Date;
-  updatedAt?: Date;
-}
+// Re-export user entities from modules
+export { User, CreateUserRequest, UpdateUserRequest, AppUser } from '../modules/user/user.entity';
 
-export interface CreateUserRequest {
-  name: string;
-  email: string;
-}
-
-export interface UpdateUserRequest {
-  name?: string;
-  email?: string;
-}
+// Re-export auth entities from modules  
+export { LoginRequest, LoginResponse, JWTPayload } from '../modules/auth/auth.entity';
 
 export interface ApiResponse<T = any> {
   code: number;
@@ -63,98 +51,7 @@ export interface EchoData {
   url: string;
 }
 
-// User Authentication Types
-export interface AppUser {
-  id: number;
-  user_id: string;
-  device_id: string;
-  app_id: string;
-  device_brand: string;
-  device_model: string;
-  os: string;
-  os_version: string;
-  client_version: string;
-  client_version_int?: number;
-  carrier?: string;
-  mac?: string;
-  imei?: string;
-  android_id?: string;
-  ga_id?: string;
-  time_zone?: string;
-  origin_language?: string;
-  simulator?: boolean;
-  install_time?: string;
-  firebase_token?: string;
-  language?: string;
-  ip?: string;
-  ip_country_code?: string;
-  gender?: string;
-  height?: number;
-  weight?: number;
-  birthday?: string;
-  nickname?: string;
-  avatar?: string;
-  register_time?: number;
-  create_time?: number;
-  is_deleted?: boolean;
-  bind_type?: string;
-  bind_id?: string;
-  bind_info?: any;
-  first_ip?: string;
-  first_ip_country_code?: string;
-  last_checkin_timestamp?: number;
-  consecutive_checkin_days?: number;
-  subscription?: any;
-  subscription_times?: number;
-  last_active_time?: number;
-  activedays?: number;
-  user_consecutive_active_days?: number;
-  user_category_ids?: string[];
-  ref?: any;
-}
 
-export interface LoginRequest {
-  android_id?: string;
-  app_id: string;
-  carrier?: string;
-  chid?: string;
-  client_version: string;
-  current_language?: string;
-  device_brand: string;
-  device_id: string;
-  device_model: string;
-  email?: string;
-  first_name?: string;
-  ga_id?: string;
-  imei?: string;
-  install_time?: string;
-  last_name?: string;
-  launch_num?: number;
-  mac?: string;
-  mchid?: string;
-  origin_language?: string;
-  os: string;
-  os_version: string;
-  simulator?: boolean;
-  time_zone?: string;
-  login_status?: string;
-  use_burned_calories?: boolean;
-  firebase_token?: string;
-}
-
-export interface LoginResponse {
-  token: string;
-  user: AppUser;
-  expires_in: number;
-}
-
-export interface JWTPayload {
-  user_id: string;
-  device_id: string;
-  app_id: string;
-  iat: number;
-  exp: number;
-}
 
 // API Response Codes
 export const ResponseCodes = {

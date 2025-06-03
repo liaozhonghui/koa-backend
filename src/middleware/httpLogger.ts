@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { logger, LogContext, LogCategory } from '../utils/logger';
+import { logger, LogContext, LogCategory } from '../singleton/logger';
 
 /**
  * HTTP 请求日志中间件

@@ -1,5 +1,5 @@
 import pino from 'pino';
-import config from '../config';
+import config from '../../config';
 
 // 日志级别枚举
 export enum LogLevel {
@@ -248,3 +248,24 @@ export class Logger {
 // 导出单例实例
 export const logger = Logger.getInstance();
 export default logger;
+
+/**
+ * Simple Logger class for backwards compatibility with tests
+ */
+export class SimpleLogger {
+  private static formatTimestamp(): string {
+    return new Date().toISOString();
+  }
+
+  static info(message: string, meta?: Record<string, any>): void {
+    console.log(`[${this.formatTimestamp()}] INFO: ${message}`, meta ? JSON.stringify(meta) : '');
+  }
+
+  static error(message: string, error?: unknown): void {
+    console.error(`[${this.formatTimestamp()}] ERROR: ${message}`, error);
+  }
+
+  static warn(message: string, meta?: Record<string, any>): void {
+    console.warn(`[${this.formatTimestamp()}] WARN: ${message}`, meta ? JSON.stringify(meta) : '');
+  }
+}

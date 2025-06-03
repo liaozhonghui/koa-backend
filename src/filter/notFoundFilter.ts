@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '../singleton/logger';
 import { ApiResponse, ResponseCodes } from '../types';
 
 /**
