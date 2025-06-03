@@ -7,20 +7,29 @@ import config from '../../config';
 const JWT_SECRET = config['jwt'].secret;
 const JWT_EXPIRES_IN: string | number = config['jwt'].expiresIn;
 
-export class JWTService {
-  /**
+export class JWTService {  /**
    * Generate JWT token for user
-   */  static generateToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
+   */  
+  static async generateToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): Promise<string> {
     try {
       const tokenPayload: Omit<JWTPayload, 'iat' | 'exp'> = {
         user_id: payload.user_id,
         device_id: payload.device_id,
         app_id: payload.app_id,
-      };      const options: SignOptions = {
+      };      
+      
+      const options: SignOptions = {
         expiresIn: JWT_EXPIRES_IN as any,
       };
-      
-      const token = jwt.sign(tokenPayload, JWT_SECRET, options);
+        const token = await new Promise<string>((resolve, reject) => {
+        jwt.sign(tokenPayload, JWT_SECRET, options, (err: any, token: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(token as string);
+          }
+        });
+      });
 
       logger.security.info('JWT token generated', {
         user_id: payload.user_id,
@@ -34,14 +43,20 @@ export class JWTService {
       logger.security.error('JWT token generation failed', error as Error);
       throw new Error('Token generation failed');
     }
-  }
-
-  /**
+  }  /**
    * Verify JWT token
    */
-  static verifyToken(token: string): JWTPayload | null {
+  static async verifyToken(token: string): Promise<JWTPayload | null> {
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;      
+      const decoded = await new Promise<JWTPayload>((resolve, reject) => {
+        jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(decoded as JWTPayload);
+          }
+        });
+      });
       logger.security.info('JWT token verified successfully', {
         user_id: decoded.user_id,
         device_id: decoded.device_id,

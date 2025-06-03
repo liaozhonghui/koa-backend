@@ -69,16 +69,14 @@ export class AuthController {
           device_id: user.device_id,
           app_id: user.app_id
         });
-      }
-
-      // Generate JWT token
+      }      // Generate JWT token
       const tokenPayload = {
         user_id: user.user_id,
         device_id: user.device_id,
         app_id: user.app_id
       };
 
-      const token = JWTService.generateToken(tokenPayload);
+      const token = await JWTService.generateToken(tokenPayload);
       const expiresIn = JWTService.getExpirationTime();
 
       const loginResponse: LoginResponse = {

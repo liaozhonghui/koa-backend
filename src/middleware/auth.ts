@@ -29,10 +29,8 @@ export function authMiddleware() {
         ctx.status = 200; // Always return 200 as per API design
         ctx.body = response;
         return;
-      }
-
-      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-      const decoded = JWTService.verifyToken(token);
+      }      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      const decoded = await JWTService.verifyToken(token);
 
       if (!decoded) {
         logger.security.warn('Invalid or expired JWT token', {
@@ -88,10 +86,9 @@ export function optionalAuthMiddleware() {
   return async (ctx: any, next: any) => {
     try {
       const authHeader = ctx.get('Authorization');
-      
-      if (authHeader && authHeader.startsWith('Bearer ')) {
+        if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
-        const decoded = JWTService.verifyToken(token);
+        const decoded = await JWTService.verifyToken(token);
           if (decoded) {
           (ctx as any).user = decoded;
           logger.security.info('Optional auth: User authenticated', {

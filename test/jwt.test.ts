@@ -5,33 +5,31 @@
 
 import { JWTService } from '../src/singleton/jwt';
 
-describe('JWT Service', () => {
-  describe('generateToken', () => {
-    it('should generate a valid JWT token', () => {
+describe('JWT Service', () => {  describe('generateToken', () => {
+    it('should generate a valid JWT token', async () => {
       const payload = {
         user_id: 'test-user-123',
         device_id: 'test-device-456',
         app_id: 'com.test.app'
       };
 
-      const token = JWTService.generateToken(payload);
+      const token = await JWTService.generateToken(payload);
       
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
       expect(token.split('.')).toHaveLength(3); // JWT has 3 parts separated by dots
     });
   });
-
   describe('verifyToken', () => {
-    it('should verify a valid token', () => {
+    it('should verify a valid token', async () => {
       const payload = {
         user_id: 'test-user-123',
         device_id: 'test-device-456',
         app_id: 'com.test.app'
       };
 
-      const token = JWTService.generateToken(payload);
-      const decoded = JWTService.verifyToken(token);
+      const token = await JWTService.generateToken(payload);
+      const decoded = await JWTService.verifyToken(token);
       
       expect(decoded).toBeDefined();
       expect(decoded!.user_id).toBe(payload.user_id);
@@ -39,15 +37,15 @@ describe('JWT Service', () => {
       expect(decoded!.app_id).toBe(payload.app_id);
     });
 
-    it('should return null for invalid token', () => {
+    it('should return null for invalid token', async () => {
       const invalidToken = 'invalid.token.here';
-      const decoded = JWTService.verifyToken(invalidToken);
+      const decoded = await JWTService.verifyToken(invalidToken);
       
       expect(decoded).toBeNull();
     });
 
-    it('should return null for empty token', () => {
-      const decoded = JWTService.verifyToken('');
+    it('should return null for empty token', async () => {
+      const decoded = await JWTService.verifyToken('');
       
       expect(decoded).toBeNull();
     });
