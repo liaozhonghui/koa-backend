@@ -17,6 +17,7 @@ import { errorFilter, notFoundFilter } from "./filter";
 // Import routes
 import userRoutes from "./routes/users";
 import apiRoutes from "./routes/api";
+import authRoutes from "./routes/auth";
 
 const app = new Koa();
 const router = new Router();
@@ -74,6 +75,8 @@ app.use(userRoutes.routes());
 app.use(userRoutes.allowedMethods());
 app.use(apiRoutes.routes());
 app.use(apiRoutes.allowedMethods());
+app.use(authRoutes.routes());
+app.use(authRoutes.allowedMethods());
 
 // Apply 404 filter last (after all routes)
 app.use(notFoundFilter());
