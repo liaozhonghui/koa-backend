@@ -31,12 +31,10 @@ export function errorFilter() {
       };
 
       let responseCode: number;
-      let responseMessage: string;
-
-      if (error.status >= 500) {
+      let responseMessage: string;      if (error.status >= 500) {
         // Server errors - map to HTTP equivalent codes
         responseCode = ResponseCodes.INTERNAL_SERVER_ERROR;
-        responseMessage = process.env["NODE_ENV"] === 'production' 
+        responseMessage = process.env["NODE_ENV"] === 'prod' 
           ? "Internal Server Error" 
           : error.message;
         

@@ -11,5 +11,5 @@ export const preConfig = {
   },
   PORT: 8080,
   LOG_LEVEL: "info",
-  NODE_ENV: "pre-production"
+  NODE_ENV: "pre"
 } as const;
