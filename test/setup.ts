@@ -8,8 +8,8 @@
 // Load environment variables from .env.test file
 // config({ path: path.resolve(__dirname, '.env.test') });
 
-// Set test environment
-process.env["NODE_ENV"] = "test";
+// Set test environment to local to use local database config
+process.env["NODE_ENV"] = "local";
 
 // Global test setup
 beforeAll(() => {

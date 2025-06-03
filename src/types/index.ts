@@ -33,6 +33,13 @@ export interface HealthCheckResponse {
   message: string;
   version: string;
   timestamp: string;
+  database?: {
+    connected: boolean;
+    host: string;
+    dbname: string;
+    reconnectAttempts?: number;
+    status?: string;
+  };
 }
 
 export interface StatusResponse {

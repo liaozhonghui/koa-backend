@@ -1,8 +1,14 @@
 {
   "appName": "Koa Backend API",
   "database": {
-    "host": "default_db_host",
-    "port": 5432
+    "host": "localhost",
+    "port": 5432,
+    "user": "postgres",
+    "password": "password",
+    "dbname": "node-db",
+    "max": 10,
+    "idleTimeoutMillis": 30000,
+    "connectionTimeoutMillis": 2000
   },
   "PORT": 3000,
   "logLevel": "info"

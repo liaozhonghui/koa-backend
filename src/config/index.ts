@@ -1,12 +1,20 @@
 import fs from "fs";
 import path from "path";
 
+interface DatabaseConfig {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  dbname: string;
+  max?: number;
+  idleTimeoutMillis?: number;
+  connectionTimeoutMillis?: number;
+}
+
 interface Config {
   appName: string;
-  database: {
-    host: string;
-    port: number;
-  };
+  database: DatabaseConfig;
   PORT: number;
   logLevel: string;
   [key: string]: any; // Allow other properties

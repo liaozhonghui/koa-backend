@@ -1,6 +1,10 @@
 {
   "database": {
-    "host": "pre.db.example.com"
+    "host": "192.168.191.148",
+    "port": 5432,
+    "user": "postgres",
+    "password": "123456",
+    "dbname": "node-db-pre"
   },
   "PORT": 8080,
   "logLevel": "info"
