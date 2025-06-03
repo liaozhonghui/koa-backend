@@ -35,23 +35,22 @@ describe('Database Error Handling and Reconnection Tests', () => {
     });
   });
 
-  describe('Query Error Handling', () => {
-    it('should handle query errors gracefully without crashing app', async () => {
+  describe('Query Error Handling', () => {    it('should handle query errors gracefully without crashing app', async () => {
       try {
         // This should fail but not crash the application
         await database.query('SELECT * FROM non_existent_table_xyz');
         // If we reach here, the query unexpectedly succeeded
-        fail('Expected query to fail');      } catch (error) {
+        fail('Expected query to fail');
+      } catch (error) {
         // This is expected - the query should fail gracefully
         expect(error).toBeDefined();
         console.log('✅ Query error handled gracefully:', (error as Error).message);
       }
-    });
-
-    it('should handle invalid SQL gracefully', async () => {
+    });    it('should handle invalid SQL gracefully', async () => {
       try {
         await database.query('INVALID SQL STATEMENT');
-        fail('Expected invalid SQL to fail');      } catch (error) {
+        fail('Expected invalid SQL to fail');
+      } catch (error) {
         expect(error).toBeDefined();
         console.log('✅ Invalid SQL handled gracefully:', (error as Error).message);
       }
@@ -59,7 +58,7 @@ describe('Database Error Handling and Reconnection Tests', () => {
   });
 
   describe('Connection Recovery', () => {
-    it('should not crash application when database connection fails', () => {
+    it('should not crash application when database connection fails', async () => {
       // This test ensures our error handling doesn't call process.exit()
       const originalExit = process.exit;
       let exitCalled = false;
@@ -75,11 +74,14 @@ describe('Database Error Handling and Reconnection Tests', () => {
         const pool = database.getPool();
         pool.emit('error', new Error('Simulated database connection error'));
         
-        // Wait a short time for error handling
-        setTimeout(() => {
-          expect(exitCalled).toBe(false);
-          console.log('✅ Application did not exit on database error');
-        }, 100);
+        // Wait a short time for error handling using Promise instead of setTimeout
+        await new Promise(resolve => {
+          setTimeout(() => {
+            expect(exitCalled).toBe(false);
+            console.log('✅ Application did not exit on database error');
+            resolve(void 0);
+          }, 100);
+        });
         
       } finally {
         // Restore original process.exit

@@ -39,7 +39,7 @@ export interface LogContext {
 
 // 创建 pino 配置
 const createPinoConfig = () => {
-  const isDevelopment = config.NODE_ENV === 'development';
+  const isDevelopment = config.NODE_ENV === 'local';
   
   const baseConfig = {
     level: config["LOG_LEVEL"] || (isDevelopment ? 'debug' : 'info'),

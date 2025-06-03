@@ -28,9 +28,9 @@ app.use(errorFilter());
 app.use(httpLogger());
 app.use(securityLogger());
 app.use(responseTime());
-app.use(cors());
-app.use(json());
-app.use(bodyParser());
+app.use(cors(appConfig.cors));
+app.use(json(appConfig.json));
+app.use(bodyParser(appConfig.bodyParser));
 
 // Health check endpoint
 router.get("/", async (ctx: any) => {
