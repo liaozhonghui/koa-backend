@@ -1,5 +1,5 @@
 import request from 'supertest';
-import Koa from 'koa';
+const Koa = require('koa');
 import bodyParser from 'koa-bodyparser';
 import userRoutes from '../src/routes/users';
 
@@ -13,7 +13,7 @@ const createTestApp = () => {
 };
 
 describe('User Routes Unit Tests', () => {
-  let app: Koa;
+  let app: any;
 
   beforeEach(() => {
     // Reset the users array before each test

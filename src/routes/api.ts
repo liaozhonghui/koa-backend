@@ -5,7 +5,7 @@ import { logger } from '../utils/logger';
 const router = new Router({ prefix: '/api' });
 
 // GET /api/status - API status endpoint
-router.get('/status', async (ctx) => {
+router.get('/status', async (ctx: any) => {
   logger.app.info('API status requested', { 
     requestId: (ctx as any).requestId 
   });
@@ -22,7 +22,7 @@ router.get('/status', async (ctx) => {
 });
 
 // GET /api/info - API information
-router.get('/info', async (ctx) => {
+router.get('/info', async (ctx: any) => {
   logger.app.info('API info requested', { 
     requestId: (ctx as any).requestId 
   });
@@ -44,7 +44,7 @@ router.get('/info', async (ctx) => {
 });
 
 // POST /api/echo - Echo endpoint for testing
-router.post('/echo', async (ctx) => {
+router.post('/echo', async (ctx: any) => {
   const data = ctx.request.body;
   
   logger.app.info('Echo endpoint called', { 

@@ -1,21 +1,12 @@
-import { Context, Next } from 'koa';
 import { v4 as uuidv4 } from 'uuid';
-import { logger, LogContext, LogCategory } from './logger';
-
-// 扩展 Koa Context 以添加日志器和请求ID
-declare module 'koa' {
-  interface DefaultContext {
-    requestId: string;
-    logger: any;
-  }
-}
+import { logger, LogContext, LogCategory } from '../utils/logger';
 
 /**
  * HTTP 请求日志中间件
  * 为每个请求生成唯一ID并记录详细的请求/响应信息
  */
 export function httpLogger() {
-  return async (ctx: Context, next: Next) => {
+  return async (ctx: any, next: any) => {
     // 生成请求ID
     const requestId = uuidv4();
     const startTime = Date.now();
@@ -122,7 +113,7 @@ export function httpLogger() {
 /**
  * 获取客户端真实IP地址
  */
-function getClientIP(ctx: Context): string {
+function getClientIP(ctx: any): string {
   return (
     ctx.get('X-Forwarded-For') ||
     ctx.get('X-Real-IP') ||
@@ -135,7 +126,7 @@ function getClientIP(ctx: Context): string {
 /**
  * 判断是否应该记录请求体
  */
-function shouldLogRequestBody(ctx: Context): boolean {
+function shouldLogRequestBody(ctx: any): boolean {
   // 只在开发环境记录请求体
   if (process.env["NODE_ENV"] !== 'development') {
     return false;
@@ -149,7 +140,7 @@ function shouldLogRequestBody(ctx: Context): boolean {
 /**
  * 判断是否应该记录响应体
  */
-function shouldLogResponseBody(ctx: Context): boolean {
+function shouldLogResponseBody(ctx: any): boolean {
   // 只在开发环境且启用了trace级别时记录响应体
   if (process.env["NODE_ENV"] !== 'development' || process.env["LOG_LEVEL"] !== 'trace') {
     return false;
@@ -166,7 +157,7 @@ function shouldLogResponseBody(ctx: Context): boolean {
  * 安全相关的请求日志中间件
  */
 export function securityLogger() {
-  return async (ctx: Context, next: Next) => {
+  return async (ctx: any, next: any) => {
     // 检测可疑请求
     const suspiciousPatterns = [
       /\.\.\//,  // Path traversal

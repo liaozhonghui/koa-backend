@@ -11,7 +11,7 @@ let users: User[] = [
 ];
 
 // GET /api/users - Get all users
-router.get('/', async (ctx) => {
+router.get('/', async (ctx: any) => {
   logger.business.info('Fetching all users', { 
     requestId: (ctx as any).requestId,
     userCount: users.length 
@@ -27,7 +27,7 @@ router.get('/', async (ctx) => {
 });
 
 // GET /api/users/:id - Get user by ID
-router.get('/:id', async (ctx) => {
+router.get('/:id', async (ctx: any) => {
   const id = parseInt(ctx.params['id'] as string);
   
   logger.business.info('Fetching user by ID', { 
@@ -61,7 +61,7 @@ router.get('/:id', async (ctx) => {
 });
 
 // POST /api/users - Create new user
-router.post('/', async (ctx) => {
+router.post('/', async (ctx: any) => {
   const { name, email }: CreateUserRequest = ctx.request.body as CreateUserRequest;
   
   logger.business.info('Creating new user', { 
@@ -112,7 +112,7 @@ router.post('/', async (ctx) => {
 });
 
 // PUT /api/users/:id - Update user
-router.put('/:id', async (ctx) => {
+router.put('/:id', async (ctx: any) => {
   const id = parseInt(ctx.params['id'] as string);
   const { name, email }: UpdateUserRequest = ctx.request.body as UpdateUserRequest;
   
@@ -159,7 +159,7 @@ router.put('/:id', async (ctx) => {
 });
 
 // DELETE /api/users/:id - Delete user
-router.delete('/:id', async (ctx) => {
+router.delete('/:id', async (ctx: any) => {
   const id = parseInt(ctx.params['id'] as string);
   
   logger.business.info('Deleting user', { 

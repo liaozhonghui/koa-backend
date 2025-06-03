@@ -1,13 +1,18 @@
-import Koa from "koa";
+const Koa = require("koa");
 import Router from "koa-router";
 import bodyParser from "koa-bodyparser";
 import cors from "@koa/cors";
 import json from "koa-json";
 import appConfig from "./config"; // Import the new config
 import Database from "./database"; // Import database
-import { HealthCheckResponse, ApiError } from "./types";
+import { HealthCheckResponse } from "./types";
 import { logger as appLogger } from "./utils/logger";
-import { httpLogger, securityLogger } from "./utils/httpLogger";
+
+// Import middleware
+import { httpLogger, securityLogger, responseTime } from "./middleware";
+
+// Import filters
+import { errorFilter, notFoundFilter } from "./filter";
 
 // Import routes
 import userRoutes from "./routes/users";
@@ -16,41 +21,23 @@ import apiRoutes from "./routes/api";
 const app = new Koa();
 const router = new Router();
 
-// Middleware
+// Apply filters first (error handling)
+app.use(errorFilter());
+
+// Apply middleware
 app.use(httpLogger());
 app.use(securityLogger());
+app.use(responseTime());
 app.use(cors());
 app.use(json());
 app.use(bodyParser());
 
-// Error handling middleware
-app.use(async (ctx, next) => {
-  try {
-    await next();
-  } catch (err: any) {
-    const error: ApiError = {
-      message: err.message || "Internal Server Error",
-      status: err.status || 500,
-    };
-
-    ctx.status = error.status;
-    ctx.body = {
-      error: {
-        message: error.message,
-        status: error.status,
-      },    };
-    appLogger.http.error('Unhandled error in request processing', err, {
-      requestId: ctx.requestId,
-      method: ctx.method,
-      url: ctx.url,
-      statusCode: error.status
-    });
-    console.error("Error:", err);
-  }
-});
-
 // Health check endpoint
-router.get("/", async (ctx) => {
+router.get("/", async (ctx: any) => {
+  appLogger.app.info('Health check requested', { 
+    requestId: (ctx as any).requestId 
+  });
+  
   // Get database connection status
   const database = Database.getInstance();
   const dbStatus = database.getConnectionStatus();
@@ -81,6 +68,9 @@ app.use(userRoutes.routes());
 app.use(userRoutes.allowedMethods());
 app.use(apiRoutes.routes());
 app.use(apiRoutes.allowedMethods());
+
+// Apply 404 filter last (after all routes)
+app.use(notFoundFilter());
 
 const PORT = appConfig.PORT; // Use port from config
 
