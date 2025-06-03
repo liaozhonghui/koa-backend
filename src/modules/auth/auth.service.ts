@@ -5,22 +5,17 @@ import { AppUser } from '../user/user.entity';
 import { logger } from '../../singleton/logger';
 
 export class AuthService {
-  private static db: Pool;
+  private db: Pool;
 
-  static async initialize() {
+  constructor() {
     const database = Database.getInstance();
     this.db = database.getPool();
   }
-
   /**
    * Find user by device_id
    */
-  static async findUserByDeviceId(deviceId: string): Promise<AppUser | null> {
+  async findUserByDeviceId(deviceId: string): Promise<AppUser | null> {
     try {
-      if (!this.db) {
-        await this.initialize();
-      }
-
       const query = `
         SELECT 
           id, user_id, device_id, app_id, device_brand, device_model, os, os_version,
@@ -54,16 +49,11 @@ export class AuthService {
       throw error;
     }
   }
-
   /**
    * Create new user from login request
    */
-  static async createUser(loginData: LoginRequest, ip?: string): Promise<AppUser> {
+  async createUser(loginData: LoginRequest, ip?: string): Promise<AppUser> {
     try {
-      if (!this.db) {
-        await this.initialize();
-      }
-
       const now = Date.now();
       const userId = `user_${loginData.device_id}_${now}`;
 
@@ -97,8 +87,7 @@ export class AuthService {
         loginData.android_id || null,              // android_id
         loginData.ga_id || null,                   // ga_id
         loginData.time_zone || null,               // time_zone
-        loginData.origin_language || null,         // origin_language
-        loginData.simulator || false,              // simulator
+        loginData.origin_language || null,         // origin_language        loginData.simulator || false,              // simulator
         loginData.install_time || null,            // install_time
         loginData.firebase_token || null,          // firebase_token
         ip || null,                                // ip
@@ -127,16 +116,11 @@ export class AuthService {
       throw error;
     }
   }
-
   /**
    * Update user's last active time and login info
    */
-  static async updateUserLoginInfo(userId: string, loginData: LoginRequest, ip?: string): Promise<void> {
+  async updateUserLoginInfo(userId: string, loginData: LoginRequest, ip?: string): Promise<void> {
     try {
-      if (!this.db) {
-        await this.initialize();
-      }
-
       const now = Date.now();
 
       const query = `
@@ -177,11 +161,10 @@ export class AuthService {
       throw error;
     }
   }
-
   /**
    * Validate login request data
    */
-  static validateLoginRequest(data: LoginRequest): string | null {
+  validateLoginRequest(data: LoginRequest): string | null {
     if (!data.device_id || typeof data.device_id !== 'string') {
       return 'device_id is required and must be a string';
     }
@@ -216,7 +199,7 @@ export class AuthService {
   /**
    * Get client IP address from request
    */
-  static getClientIP(ctx: any): string {
+  getClientIP(ctx: any): string {
     return (
       ctx.get('X-Forwarded-For') ||
       ctx.get('X-Real-IP') ||

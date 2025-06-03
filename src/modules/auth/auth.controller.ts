@@ -6,14 +6,18 @@ import { JWTService } from '../../singleton/jwt';
 import { AuthService } from './auth.service';
 
 export class AuthController {
-  /**
+  private authService: AuthService;
+
+  constructor(authService: AuthService) {
+    this.authService = authService;
+  }  /**
    * POST /auth/login - User login/register
    * Registers new user or logs in existing user based on device_id
    */
-  static async login(ctx: any) {
+  async login(ctx: any) {
     try {
       const loginData: LoginRequest = ctx.request.body as LoginRequest;
-      const clientIP = AuthService.getClientIP(ctx);
+      const clientIP = this.authService.getClientIP(ctx);
 
       logger.business.info('Login attempt', {
         requestId: (ctx as any).requestId,
@@ -23,10 +27,8 @@ export class AuthController {
         device_brand: loginData.device_brand,
         client_version: loginData.client_version,
         ip: clientIP
-      });
-
-      // Validate required fields
-      const validationError = AuthService.validateLoginRequest(loginData);
+      });      // Validate required fields
+      const validationError = this.authService.validateLoginRequest(loginData);
       if (validationError) {
         logger.business.warn('Login validation failed', {
           requestId: (ctx as any).requestId,
@@ -46,11 +48,11 @@ export class AuthController {
       let user: AppUser;
 
       // Check if user exists by device_id
-      const existingUser = await AuthService.findUserByDeviceId(loginData.device_id);
+      const existingUser = await this.authService.findUserByDeviceId(loginData.device_id);
 
       if (existingUser) {
         // Update existing user's login info
-        await AuthService.updateUserLoginInfo(existingUser.user_id, loginData, clientIP);
+        await this.authService.updateUserLoginInfo(existingUser.user_id, loginData, clientIP);
         user = existingUser;
         
         logger.business.info('Existing user login', {
@@ -61,7 +63,7 @@ export class AuthController {
         });
       } else {
         // Create new user
-        user = await AuthService.createUser(loginData, clientIP);
+        user = await this.authService.createUser(loginData, clientIP);
         
         logger.business.info('New user registered and logged in', {
           requestId: (ctx as any).requestId,
@@ -106,12 +108,11 @@ export class AuthController {
       ctx.body = response;
     }
   }
-
   /**
    * GET /auth/user - Get current user info
    * Requires valid JWT token in Authorization header
    */
-  static async getUserInfo(ctx: any) {
+  async getUserInfo(ctx: any) {
     try {
       const userPayload = (ctx as any).user as JWTPayload;
 
@@ -122,7 +123,7 @@ export class AuthController {
       });
 
       // Get current user data from database
-      const user = await AuthService.findUserByDeviceId(userPayload.device_id);
+      const user = await this.authService.findUserByDeviceId(userPayload.device_id);
 
       if (!user) {
         logger.business.warn('User not found for valid token', {
