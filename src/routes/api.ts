@@ -1,10 +1,15 @@
 import Router from 'koa-router';
 import { StatusResponse, InfoResponse, EchoResponse } from '../types';
+import { logger } from '../utils/logger';
 
 const router = new Router({ prefix: '/api' });
 
 // GET /api/status - API status endpoint
 router.get('/status', async (ctx) => {
+  logger.app.info('API status requested', { 
+    requestId: (ctx as any).requestId 
+  });
+  
   const response: StatusResponse = {
     status: 'healthy',
     uptime: process.uptime(),
@@ -18,6 +23,10 @@ router.get('/status', async (ctx) => {
 
 // GET /api/info - API information
 router.get('/info', async (ctx) => {
+  logger.app.info('API info requested', { 
+    requestId: (ctx as any).requestId 
+  });
+  
   const response: InfoResponse = {
     name: 'Koa Backend API',
     description: 'A modern REST API built with Koa 3.0.0 and TypeScript',
@@ -37,6 +46,12 @@ router.get('/info', async (ctx) => {
 // POST /api/echo - Echo endpoint for testing
 router.post('/echo', async (ctx) => {
   const data = ctx.request.body;
+  
+  logger.app.info('Echo endpoint called', { 
+    requestId: (ctx as any).requestId,
+    bodyType: typeof data,
+    hasBody: !!data
+  });
   
   const response: EchoResponse = {
     success: true,

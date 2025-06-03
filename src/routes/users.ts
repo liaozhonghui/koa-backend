@@ -1,5 +1,6 @@
 import Router from 'koa-router';
 import { User, CreateUserRequest, UpdateUserRequest, ApiResponse } from '../types';
+import { logger } from '../utils/logger';
 
 const router = new Router({ prefix: '/api/users' });
 
@@ -11,6 +12,11 @@ let users: User[] = [
 
 // GET /api/users - Get all users
 router.get('/', async (ctx) => {
+  logger.business.info('Fetching all users', { 
+    requestId: (ctx as any).requestId,
+    userCount: users.length 
+  });
+  
   const response: ApiResponse<User[]> = {
     success: true,
     data: users,
@@ -23,9 +29,20 @@ router.get('/', async (ctx) => {
 // GET /api/users/:id - Get user by ID
 router.get('/:id', async (ctx) => {
   const id = parseInt(ctx.params['id'] as string);
+  
+  logger.business.info('Fetching user by ID', { 
+    requestId: (ctx as any).requestId,
+    userId: id.toString()
+  });
+  
   const user = users.find(u => u.id === id);
   
   if (!user) {
+    logger.business.warn('User not found', { 
+      requestId: (ctx as any).requestId,
+      userId: id.toString()
+    });
+    
     ctx.status = 404;
     const response: ApiResponse = {
       success: false,
@@ -47,7 +64,18 @@ router.get('/:id', async (ctx) => {
 router.post('/', async (ctx) => {
   const { name, email }: CreateUserRequest = ctx.request.body as CreateUserRequest;
   
+  logger.business.info('Creating new user', { 
+    requestId: (ctx as any).requestId,
+    name,
+    email 
+  });
+  
   if (!name || !email) {
+    logger.business.warn('User creation failed - missing required fields', { 
+      requestId: (ctx as any).requestId,
+      missingFields: { name: !name, email: !email }
+    });
+    
     ctx.status = 400;
     const response: ApiResponse = {
       success: false,
@@ -66,6 +94,13 @@ router.post('/', async (ctx) => {
   
   users.push(newUser);
   
+  logger.business.info('User created successfully', { 
+    requestId: (ctx as any).requestId,
+    userId: newUser.id.toString(),
+    name: newUser.name,
+    email: newUser.email 
+  });
+  
   ctx.status = 201;
   const response: ApiResponse<User> = {
     success: true,
@@ -80,9 +115,21 @@ router.post('/', async (ctx) => {
 router.put('/:id', async (ctx) => {
   const id = parseInt(ctx.params['id'] as string);
   const { name, email }: UpdateUserRequest = ctx.request.body as UpdateUserRequest;
+  
+  logger.business.info('Updating user', { 
+    requestId: (ctx as any).requestId,
+    userId: id.toString(),
+    updates: { name, email }
+  });
+  
   const userIndex = users.findIndex(u => u.id === id);
   
   if (userIndex === -1) {
+    logger.business.warn('User update failed - user not found', { 
+      requestId: (ctx as any).requestId,
+      userId: id.toString()
+    });
+    
     ctx.status = 404;
     const response: ApiResponse = {
       success: false,
@@ -96,6 +143,12 @@ router.put('/:id', async (ctx) => {
   if (email) users[userIndex]!.email = email;
   users[userIndex]!.updatedAt = new Date();
   
+  logger.business.info('User updated successfully', { 
+    requestId: (ctx as any).requestId,
+    userId: id.toString(),
+    updatedUser: users[userIndex]
+  });
+  
   const response: ApiResponse<User> = {
     success: true,
     data: users[userIndex]!,
@@ -108,9 +161,20 @@ router.put('/:id', async (ctx) => {
 // DELETE /api/users/:id - Delete user
 router.delete('/:id', async (ctx) => {
   const id = parseInt(ctx.params['id'] as string);
+  
+  logger.business.info('Deleting user', { 
+    requestId: (ctx as any).requestId,
+    userId: id.toString()
+  });
+  
   const userIndex = users.findIndex(u => u.id === id);
   
   if (userIndex === -1) {
+    logger.business.warn('User deletion failed - user not found', { 
+      requestId: (ctx as any).requestId,
+      userId: id.toString()
+    });
+    
     ctx.status = 404;
     const response: ApiResponse = {
       success: false,
@@ -121,6 +185,15 @@ router.delete('/:id', async (ctx) => {
   }
   
   const deletedUser = users.splice(userIndex, 1)[0]!;
+  
+  logger.business.info('User deleted successfully', { 
+    requestId: (ctx as any).requestId,
+    userId: id.toString(),
+    deletedUser: {
+      name: deletedUser.name,
+      email: deletedUser.email
+    }
+  });
   
   const response: ApiResponse<User> = {
     success: true,

@@ -11,5 +11,5 @@
     "connectionTimeoutMillis": 2000
   },
   "PORT": 3000,
-  "logLevel": "info"
+  "LOG_LEVEL": "info"
 }

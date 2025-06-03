@@ -16,7 +16,8 @@ interface Config {
   appName: string;
   database: DatabaseConfig;
   PORT: number;
-  logLevel: string;
+  NODE_ENV: string;
+  LOG_LEVEL: string;
   [key: string]: any; // Allow other properties
 }
 
@@ -31,5 +32,9 @@ if (fs.existsSync(envConfigPath)) {
   // Deep merge, environment-specific config overrides default
   config = { ...config, ...envConfig, database: { ...config.database, ...envConfig.database } };
 }
+
+// 添加环境变量支持
+config.NODE_ENV = env;
+config["LOG_LEVEL"] = process.env["LOG_LEVEL"] || config["LOG_LEVEL"];
 
 export default config;

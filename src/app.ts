@@ -2,11 +2,12 @@ import Koa from "koa";
 import Router from "koa-router";
 import bodyParser from "koa-bodyparser";
 import cors from "@koa/cors";
-import logger from "koa-logger";
 import json from "koa-json";
 import appConfig from "./config"; // Import the new config
 import Database from "./database"; // Import database
 import { HealthCheckResponse, ApiError } from "./types";
+import { logger as appLogger } from "./utils/logger";
+import { httpLogger, securityLogger } from "./utils/httpLogger";
 
 // Import routes
 import userRoutes from "./routes/users";
@@ -16,7 +17,8 @@ const app = new Koa();
 const router = new Router();
 
 // Middleware
-app.use(logger());
+app.use(httpLogger());
+app.use(securityLogger());
 app.use(cors());
 app.use(json());
 app.use(bodyParser());
@@ -36,8 +38,13 @@ app.use(async (ctx, next) => {
       error: {
         message: error.message,
         status: error.status,
-      },
-    };
+      },    };
+    appLogger.http.error('Unhandled error in request processing', err, {
+      requestId: ctx.requestId,
+      method: ctx.method,
+      url: ctx.url,
+      statusCode: error.status
+    });
     console.error("Error:", err);
   }
 });
@@ -86,16 +93,23 @@ if (require.main === module) {
   database.testConnection().then((connected) => {
     if (connected) {
       app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`📍 Health check: http://localhost:${PORT}/`);
-        console.log(`🗄️ Database connected to ${appConfig.database.host}:${appConfig.database.port}/${appConfig.database.dbname}`);
+        appLogger.app.info('Server started successfully', {
+          port: PORT,
+          environment: appConfig.NODE_ENV,
+          healthCheck: `http://localhost:${PORT}/`,
+          database: {
+            host: appConfig.database.host,
+            port: appConfig.database.port,
+            dbname: appConfig.database.dbname
+          }
+        });
       });
     } else {
-      console.error('❌ Failed to connect to database. Server not started.');
+      appLogger.app.fatal('Failed to connect to database. Server not started.');
       process.exit(1);
     }
   }).catch((error) => {
-    console.error('❌ Database connection error:', error);
+    appLogger.app.fatal('Database connection error during startup', error);
     process.exit(1);
   });
 }
