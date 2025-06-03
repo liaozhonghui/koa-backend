@@ -54,7 +54,7 @@ export class AuthService {
    */
   async createUser(loginData: LoginRequest, ip?: string): Promise<AppUser> {
     try {
-      const now = Date.now();
+      const now = Math.trunc(Date.now() / 1000);
       const userId = `user_${loginData.device_id}_${now}`;
 
       const query = `
@@ -87,7 +87,8 @@ export class AuthService {
         loginData.android_id || null,              // android_id
         loginData.ga_id || null,                   // ga_id
         loginData.time_zone || null,               // time_zone
-        loginData.origin_language || null,         // origin_language        loginData.simulator || false,              // simulator
+        loginData.origin_language || null,         // origin_language        
+        loginData.simulator || false,              // simulator
         loginData.install_time || null,            // install_time
         loginData.firebase_token || null,          // firebase_token
         ip || null,                                // ip
@@ -121,7 +122,7 @@ export class AuthService {
    */
   async updateUserLoginInfo(userId: string, loginData: LoginRequest, ip?: string): Promise<void> {
     try {
-      const now = Date.now();
+      const now = Math.trunc(Date.now() / 1000);
 
       const query = `
         UPDATE public."user" 

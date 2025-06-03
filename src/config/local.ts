@@ -9,7 +9,7 @@ export const localConfig = {
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000
   },
-  PORT: 3001,
+  PORT: 7001,
   LOG_LEVEL: "debug",
   NODE_ENV: "local"
 } as const;

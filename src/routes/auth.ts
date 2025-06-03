@@ -3,7 +3,7 @@ import { authMiddleware } from '../middleware/auth';
 import { AuthController } from '../modules/auth/auth.controller';
 import { AuthService } from '../modules/auth/auth.service';
 
-const router = new Router({ prefix: '/auth' });
+const router = new Router({  });
 
 // Create instances
 const authService = new AuthService();
