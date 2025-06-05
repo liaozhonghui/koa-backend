@@ -8,13 +8,14 @@
 // Load environment variables from .env.test file
 // config({ path: path.resolve(__dirname, '.env.test') });
 
-// Set test environment to local to use local database config
-process.env["NODE_ENV"] = "local";
+// Set test environment to test mode - this will automatically use test config
+// which includes LOG_LEVEL: "silent" to disable web logs during testing
+process.env["NODE_ENV"] = "test";
 
 // Global test setup
 beforeAll(() => {
   // Setup that runs before all tests
-  console.log("🧪 Test environment initialized");
+  console.log("🧪 Test environment initialized (web logs disabled via config)");
 });
 
 afterAll(() => {

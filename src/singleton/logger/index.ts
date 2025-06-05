@@ -42,7 +42,7 @@ const createPinoConfig = () => {
   const isDevelopment = config.NODE_ENV === 'local';
   
   const baseConfig = {
-    level: config["LOG_LEVEL"] || (isDevelopment ? 'debug' : 'info'),
+    level: config.LOG_LEVEL || (isDevelopment ? 'debug' : 'info'),
     formatters: {
       level: (label: string) => {
         return { level: label.toUpperCase() };

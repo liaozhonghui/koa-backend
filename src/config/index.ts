@@ -2,6 +2,7 @@ import { defaultConfig } from "./default";
 import { localConfig } from "./local";
 import { prodConfig } from "./prod";
 import { preConfig } from "./pre";
+import { testConfig } from "./test";
 
 interface DatabaseConfig {
   host: string;
@@ -71,7 +72,8 @@ const envConfigs = {
   production: prodConfig,
   "pre-production": preConfig,
   prod: prodConfig,
-  pre: preConfig
+  pre: preConfig,
+  test: testConfig
 };
 
 // Get environment-specific config

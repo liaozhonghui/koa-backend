@@ -7,6 +7,7 @@ import { ResponseCodes } from '../src/types';
 // Create a minimal Koa app for testing the auth routes
 const createTestApp = () => {
   const app = new Koa();
+  // Only include essential middleware for testing
   app.use(bodyParser());
   app.use(authRoutes.routes());
   app.use(authRoutes.allowedMethods());
@@ -21,7 +22,7 @@ describe('Auth Routes Unit Tests', () => {
     app = createTestApp();
   });
 
-  describe('POST /auth/login', () => {
+  describe('POST /login', () => {
     const validLoginData = {
       android_id: "test-android-id",
       app_id: "com.ai.nutrition.calorie.tracker",
@@ -58,7 +59,7 @@ describe('Auth Routes Unit Tests', () => {
       };
 
       const response = await request(app.callback())
-        .post('/auth/login')
+        .post('/login')
         .send(invalidData)
         .expect(200);
 
@@ -72,7 +73,7 @@ describe('Auth Routes Unit Tests', () => {
       delete (invalidData as any).device_id;
 
       const response = await request(app.callback())
-        .post('/auth/login')
+        .post('/login')
         .send(invalidData)
         .expect(200);
 
@@ -81,10 +82,10 @@ describe('Auth Routes Unit Tests', () => {
     });
   });
 
-  describe('GET /auth/user', () => {
+  describe('GET /user', () => {
     it('should return unauthorized without token', async () => {
       const response = await request(app.callback())
-        .get('/auth/user')
+        .get('/user')
         .expect(200);
 
       expect(response.body).toHaveProperty('code', ResponseCodes.UNAUTHORIZED);
@@ -93,7 +94,7 @@ describe('Auth Routes Unit Tests', () => {
 
     it('should return invalid token for malformed token', async () => {
       const response = await request(app.callback())
-        .get('/auth/user')
+        .get('/user')
         .set('Authorization', 'Bearer invalid-token')
         .expect(200);
 
@@ -103,7 +104,7 @@ describe('Auth Routes Unit Tests', () => {
 
     it('should return unauthorized for missing Bearer prefix', async () => {
       const response = await request(app.callback())
-        .get('/auth/user')
+        .get('/user')
         .set('Authorization', 'some-token')
         .expect(200);
 
